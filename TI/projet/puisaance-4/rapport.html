@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Puissance 4 - Vincent Le Meur & Marie Rousselot</title>
+
+    <link rel="stylesheet" type="text/css" href="grille.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="./index.html">Jeu</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="./regles.html">Regles du jeu</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="./rapport.html">Rapport</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main>
+    <br>
+    <h1>Mini rapport</h1>
+    
+    <h2>Introduction</h2>
+    <p>Ce rapport conclut le projet "Technologie d'Internet" a travers la realisation d'un jeu "Puissance 4" en utilisant HTML, CSS et JavaScript. L'objectif principal de ce projet etait de creer une interface interactive et conviviale permettant aux joueurs de jouer en ligne. Le principe du jeu est simple : aligner quatre pions de la meme couleur pour remporter la partie. Les fonctionnalites attendues etaient les suivantes : une grille de jeu, la saisie des pseudos des joueurs, l'affichage du nombre de victoires, la detection automatique du vainqueur et la possibilite de rejouer. De plus, une page presentant les regles du jeu ainsi qu'une page de rapport etaient egalement demandees.</p>
+    
+    <h2>Realisation</h2>
+    <p>Conformement aux attentes, notre site web dispose de 3 pages. La premiere est la page pour jouer au Puissance 4. Cette page contient une grille de jeu dynamique, representee visuellement par une structure de lignes et de colonnes. On y retrouve egalement 2 champs de saisie pour rentrer les noms des joueurs, ainsi qu'un bouton "Jouer". Une fois les champs de saisie remplis et le bouton "Jouer" clique, 7 boutons et un espace avec le nom des joueurs, leurs scores et le tour apparaissent. Les joueurs peuvent cliquer sur ces boutons, situes au dessus de chaque colonne, pour placer leur pion. Les pions sont empiles dans les colonnes jusqu'a ce qu'une colonne soit pleine. Un bouton "Rejouer" apparait egalement sous la grille et permet de recommencer la partie en reinitialisant la grille. Une fois que l'un des joueurs a gagne, le score de ce joueur augmente et une nouvelle partie se lance. Le jeu prend egalement en compte les cas des parties nulles, c'est-a-dire sans vainqueur. La deuxieme page correspond aux regles du jeu et la derniere page est un mini-rapport. On peut naviguer entre ces pages grace a une barre de navigation situee en haut de la page. </p>
+    
+    <p>Afin de realiser le projet dans le temps imparti et de travailler de maniere efficace, nous avons mis en place un GitLab pour echanger les fichiers et conserver les versions anterieures. Étant un duo travaillant sur ce projet, nous avons reparti les taches entre nous. Marie s'est occupee de la partie concernant les noms des joueurs, les scores, le lancement de la partie et l'esthetique du projet. Vincent, quant a lui, s'est concentre sur la programmation du jeu du Puissance 4.</p>
+    
+    <h2>Choix de conception</h2>
+    <p> Notre grille est concue de maniere classique afin de conserver les codes et l'identite visuelle du jeu. De meme, les pions sont de couleur jaune et rouge, conformement aux standards du Puissance 4. Nous avons opte pour l'utilisation de boutons afin de permettre aux joueurs de placer leurs pions. Cette representation est simple, ergonomique et conviviale. Chaque colonne dispose de son propre bouton, facilitant ainsi l'identification de l'emplacement ou placer le pion.
+
+    De plus, les boutons deviennent inactifs des qu'une colonne est remplie. Les joueurs beneficient d'indicateurs tels que le tour du joueur en cours et le score (nombre de victoires de chaque joueur). Pour commencer la partie, il est necessaire de saisir les pseudos des joueurs dans un formulaire. La saisie d'un pseudo vide est impossible, ce qui permet d'identifier les joueurs et de leur donner une identite.
+
+    Les joueurs ont egalement la possibilite de recommencer la partie a tout moment en appuyant sur le bouton "Recommencer". Un message d'alerte apparaitra une fois la partie terminee, annoncant le vainqueur ou l'egalite entre les joueurs.</p>
+    
+    <h2>Difficultees rencontrees</h2>
+    <p> Nous avons choisi d'utiliser une grille en HTML composee de div avec les classes "colonne" et "ligne". Cela nous permet d'acceder facilement aux cases souhaitees en utilisant leurs identifiants, ce qui facilite, par exemple, la modification de la couleur d'une case. Toutefois, ulterieurement, nous avons du convertir cette grille en une matrice dans notre code JavaScript afin de pouvoir evaluer les conditions de victoire.</p>
+    
+    <h2>Amelioration possibles</h2>
+    <p>Comme possibilites d'amelioration, nous pourrions envisager que les joueurs puissent cliquer sur les cases ou ils souhaitent placer leur pion, au lieu de devoir cliquer sur les boutons situes au-dessus de la grille. De plus, l'ajout d'une animation de descente des pions dans la grille pourrait etre envisage pour ameliorer l'aspect visuel du jeu.</p>
+    
+    <h2>Conclusion</h2>
+    
+    <p>Pour conclure, nous avons reussi a creer une interface interactive, responsive et conviviale pour permettre aux utilisateurs de jouer au Puissance 4 en ligne. En respectant les besoins du projet, nous avons integre les fonctionnalites essentielles et mis en oeuvre une conception esthetique. Le site web offre une experience de jeu immersive, tout en maintenant la simplicite et le plaisir du jeu.</p>
+  </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

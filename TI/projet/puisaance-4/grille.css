@@ -1,0 +1,96 @@
+/* Styles des cercles */
+.circle {
+    width: 70px;
+    height: 90px;
+    border-radius: 90%; /* Forme un cercle */
+    margin: 15px; /* Marge autour des cercles */
+}
+
+/* Style des cases vides */
+.empty {
+    background-color: white; /* Fond blanc pour les cases vides */
+}
+
+/* Style des jetons rouges */
+.red {
+    background-color: red; /* Fond rouge pour les jetons rouges */
+}
+
+/* Style des jetons jaunes */
+.yellow {
+    background-color: yellow; /* Fond jaune pour les jetons jaunes */
+}
+
+/* Style de la grille */
+.grille {
+    background-color: blue; /* Fond bleu pour la grille */
+    min-width: 780px; 
+}
+
+/* Styles généraux du document */
+body {
+    font-family: Arial, sans-serif; /* Police de caractères */
+    margin: 20px; /* Marge autour du document */
+}
+
+h1 {
+    text-align: center; /* Centrer le titre */
+}
+
+h2 {
+    margin-top: 20px; /* Marge supérieure pour les sous-titres */
+}
+
+p {
+    margin-bottom: 10px; /* Marge inférieure pour les paragraphes */
+}
+
+/* Styles des boutons */
+.col-btn {
+  display: flex; /* Affichage en ligne */
+  align-items: center;
+  justify-content: center;
+  padding: 15px 15px;
+  font-size: 16px;/* Taille de la police */
+  font-weight: bold; /* Gras */
+  text-align: center;/* Centrer le texte */
+  text-decoration: none; /* Pas de soulignement */
+  background-color: #f2f2f2;
+  color: #000;/* Couleur du texte */
+  border: none;
+  border-radius: 2px;/* Coins arrondis */
+  cursor: pointer;/* Curseur de type pointeur */
+  width: 100%;
+  max-width: 100px;
+}
+
+/*Affichage repsonsive*/
+@media (max-width: 576px) {
+  .col-sm {
+    flex-basis: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  body {
+    min-width: 780px;
+    overflow-x: auto;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 767px) {
+  .col-sm {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .col-sm {
+    flex: 0 0 33.3333%;
+    max-width: 33.3333%;
+  }
+}
+
+

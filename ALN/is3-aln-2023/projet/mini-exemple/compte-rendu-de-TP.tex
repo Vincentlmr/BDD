@@ -1,0 +1,117 @@
+% xelatex compte-rendu-de-TP
+% modifier le document à partir de la ligne 90
+
+\documentclass[11pt]{article}
+\DeclareTextCommandDefault{\nobreakspace}{\leavevmode\nobreak\ }
+\usepackage{xunicode}
+\usepackage{fontspec}
+\usepackage{xltxtra}
+\usepackage{url}
+% \usepackage[francais]{babel}
+\usepackage{fullpage}
+\usepackage{fancyvrb}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\definecolor{terminalbgcolor}{HTML}{330033}
+\definecolor{terminalrulecolor}{HTML}{000099}
+\newcommand{\lstconsolestyle}{
+\lstset{
+	backgroundcolor=\color{terminalbgcolor},
+	basicstyle=\color{white}\fontfamily{lmtt}\footnotesize\selectfont,
+	breakatwhitespace=false,  
+	breaklines=true,
+	captionpos=b,
+	commentstyle=\color{mygreen},
+	deletekeywords={...},
+	escapeinside={\%*}{*)},
+	extendedchars=true,
+	frame=single,
+	keepspaces=true,
+	keywordstyle=\color{blue},
+	%language=none,
+	morekeywords={*,...},
+	numbers=none,
+	numbersep=5pt,
+    framerule=2pt,
+	numberstyle=\color{mygray}\tiny\selectfont,
+	rulecolor=\color{terminalrulecolor},
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	stepnumber=2,
+	stringstyle=\color{mymauve},
+	tabsize=2
+}
+}
+
+\lstconsolestyle
+
+%% Environnements
+
+%% Ensembles mathématiques
+
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\renewcommand{\emptyset}{\varnothing}
+
+\makeatletter %
+\renewcommand{\verbatim@font}{ %
+    \ttfamily\footnotesize\catcode`\<=\active\catcode`\>=\active %
+}
+\makeatother
+
+\begin{document}
+\begin{center}
+\textbf{\bf Rapport de Projet d'ALN}
+ 
+\end{center}
+\medskip
+\hrule
+ 
+\bigskip
+
+\section{Résolution de systèmes triangulaires}
+
+J'ai programmé et testé ma propre version 
+(nommée \texttt{my\_solve\_triangular}) de \texttt{solve\_triangular}. 
+Son paramétrage est compatible avec celui de \texttt{solve\_triangular}.
+Note~: je n'ai pas eu le temps de tout programmer.
+L'exception \texttt{ValueError ("pas encore implémenté")} est
+levée si une fonctionnalité non implémentée est appelée.
+
+Fichier~: \texttt{projet/mini-exemple/my\_solve\_triangular.py}. 
+
+Fichier de test~: \texttt{my\_solve\_triangular.py}.
+
+Extrait de la documentation~:
+\begin{Verbatim}[fontsize=\small]
+# Résout A . x = b où A est une matrice triangulaire
+#         trans : 'N' ou 'T' (indique s'il faut transposer A ou pas)
+#         lower : True ou False (indique où sont les données)
+# unit_diagonal : True ou False
+# Retourne le vecteur x solution
+
+def my_solve_triangular (A, b, trans='N', lower=True, unit_diagonal=False) 
+\end{Verbatim}
+
+Exécution des tests~:
+\begin{lstlisting}
+$ python3 test_my_solve_triangular.py 
+Exécution de test_my_solve_triangular_1 : succès
+Nombre de tests  : 1
+Nombre de succès : 1
+Nombre d'échecs  : 0
+\end{lstlisting}
+
+\end{document}
+
+

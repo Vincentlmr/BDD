@@ -1,0 +1,61 @@
+
+#title{
+    padding : 20px;
+
+}
+
+
+
+.titrecv{
+    text-align: center;
+}
+
+p{
+    padding-left: 15px;
+
+}
+
+.prem{
+    color: #135763;
+}
+
+.cv{
+    padding-left: 15px;
+}
+
+
+body{
+    background-color: #ecf4f5;
+}
+
+.nom{
+    color: #2455b8;
+}
+
+.img{
+    padding-left: 15px;
+}
+
+footer {
+    /*position: fixed;
+    bottom: 0;*/
+    width: 100%;
+    background-color: white;
+    text-align: center;
+    padding: 20px;
+
+}
+
+
+
+aside {
+    width: 50%;
+    padding-left: 0.5rem;
+    margin-left: 0.5rem;
+    float: right;
+    box-shadow: inset 5px 0 5px -5px #2455b8;
+    font-style: italic;
+    color: #2455b8;
+}
+
+

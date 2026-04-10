@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Jeu de pari</title>
+
+    <style>
+      html {
+        font-family: sans-serif;
+      }
+
+      body {
+        width: 50%;
+        max-width: 800px;
+        min-width: 480px;
+        margin: 0 auto;
+      }
+      
+      .form input[type="number"] {
+        width: 200px;
+      }
+
+      .lastResult {
+        color: white;
+        padding: 3px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Jeu de pari</h1>
+
+    <p> Le principe est le suivant : à chaque tour, l'ordinateur choisit secrètement un nombre aléatoire entre 0 et 20. <br>
+    <br>
+    L'utilisateur doit ensuite à son tour choisir un nombre:<br>
+    -Si le nombre choisit par l'utilisateur est plus petit que le nombre secret, l'utilisateur perd sa mise. <br>
+    -S'il est plus grand, l'utilisateur gagne deux fois sa mise, sauf si le nombre qu'il a choisit est beaucoup plus grand (plus de 5 d'écart avec le nombre secret) ; dans ce cas, l'utilisateur perd sa mise.</p>
+    
+    <h3> Appuyer sur Jouer pour commencer : </h3>
+
+    <button>Jouer</button>
+    
+
+   <script src="exo1.js"></script>
+  </body>
+</html>

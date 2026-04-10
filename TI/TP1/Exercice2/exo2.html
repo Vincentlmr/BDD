@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+
+    <title>De l'art et des mots</title>
+
+    <style>
+      html {
+        font-family: sans-serif;
+      }
+
+      body {
+        width: 50%;
+        max-width: 800px;
+        min-width: 480px;
+        margin: 0 auto;
+      }
+      
+      .form input[type="number"] {
+        width: 200px;
+      }
+
+      .lastResult {
+        color: white;
+        padding: 3px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>De l'art et des mots</h1>
+
+    <p>Le principe est de stylisé les mots d'un texte fourni par un utilisateur<br>
+    On présentera chaque mot sur une ligne distincte, et on enlèvera les signes de ponctuation <br>
+    <br>
+    - Quantité de rouge : N au carré, modulo 256<br>
+    - Quantité de vert : le nombre de lettre du mot au cube, modulo 256<br>
+    - Quantité de bleu : 10 fois le rang du mot dans le texte (premier mot, deuxième mot,...) modulo 256.</p>
+        
+    <h3> Ecriver votre texte : </h3>
+    
+    
+    <textarea id="input" rows="10" cols="50"></textarea><br>
+    
+    <h3> Appuyer sur le boutton pour commencer : </h3>
+
+    <button onclick="colorize()">COMMENCER</button>
+    
+    <h3>Texte sans ponctuation:</h3>
+    <div id="texte"></div>
+    <br>
+    <h3>Texte coloré :</h3>
+    <div id="colorise"></div>
+    
+
+   <script src="exo2.js"></script>
+  </body>
+</html>

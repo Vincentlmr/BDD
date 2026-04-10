@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8">
+    <title>Puissance 4 - Vincent Le Meur & Marie Rousselot</title>
+    
+    <!-- Inclusion d'une feuille de style-->
+    <link rel="stylesheet" type="text/css" href="grille.css">
+    
+    <!-- Inclusion de Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+        crossorigin="anonymous">
+        
+    <!-- Inclusion de Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body>
+    
+    <!-- Barre de navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="./index.html">Jeu</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="./regles.html">Règles du jeu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="./rapport.html">Rapport</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <br>
+        <h1>Jeu de Puissance 4</h1>
+        
+        <!-- Formulaire pour les noms des joueurs -->
+        <form id="frm">
+            <label for="joueur1">Joueur 1 :</label>
+            <input type="text" id="joueur1" name="joueur1" required><br>
+            <label for="joueur2">Joueur 2 :</label>
+            <input type="text" id="joueur2" name="joueur2" required><br>
+            <button id="jouer" type="submit">Jouer !</button>
+        </form>
+        
+        <!-- Paragraphe pour afficher les noms des joueurs -->
+        <p id="j1"></p>
+        <p id="j2"></p>
+        
+        <!-- Paragraphe pour afficher le joueur actuel -->
+        <p id="a_jouer"></p>
+        
+        <!-- Boutons de la grille de jeu-->
+        <div class="container mt-3">
+            <div class="row justify-content-center" id="boutons" style="display: none;">
+                <div class="col-md-10 offset-md-1">
+                    <div class="row justify-content-center">
+                        <div class="col">
+                            <button id="col1" class="col-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button id="col2" class="col-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button id="col3" class="col-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button id="col4" class="col-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button id="col5" class="col-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button id="col6" class="col-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button id="col7" class="col-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Grille de jeu-->
+        <div class="container mt-3 grille">
+            <div class="row">
+                <div class="col-md-10 offset-md-1">
+                    <div class="row">
+                        <div class="col-12 col-sm circle empty" id="42"></div>
+                        <div class="col-12 col-sm circle empty" id="41"></div>
+                        <div class="col-12 col-sm circle empty" id="40"></div>
+                        <div class="col-12 col-sm circle empty" id="39"></div>
+                        <div class="col-12 col-sm circle empty" id="38"></div>
+                        <div class="col-12 col-sm circle empty" id="37"></div>
+                        <div class="col-12 col-sm circle empty" id="36"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm circle empty" id="35"></div>
+                        <div class="col-12 col-sm circle empty" id="34"></div>
+                        <div class="col-12 col-sm circle empty" id="33"></div>
+                        <div class="col-12 col-sm circle empty" id="32"></div>
+                        <div class="col-12 col-sm circle empty" id="31"></div>
+                        <div class="col-12 col-sm circle empty" id="30"></div>
+                        <div class="col-12 col-sm circle empty" id="29"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm circle empty" id="28"></div>
+                        <div class="col-12 col-sm circle empty" id="27"></div>
+                        <div class="col-12 col-sm circle empty" id="26"></div>
+                        <div class="col-12 col-sm circle empty" id="25"></div>
+                        <div class="col-12 col-sm circle empty" id="24"></div>
+                        <div class="col-12 col-sm circle empty" id="23"></div>
+                        <div class="col-12 col-sm circle empty" id="22"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm circle empty" id="21"></div>
+                        <div class="col-12 col-sm circle empty" id="20"></div>
+                        <div class="col-12 col-sm circle empty" id="19"></div>
+                        <div class="col-12 col-sm circle empty" id="18"></div>
+                        <div class="col-12 col-sm circle empty" id="17"></div>
+                        <div class="col-12 col-sm circle empty" id="16"></div>
+                        <div class="col-12 col-sm circle empty" id="15"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm circle empty" id="14"></div>
+                        <div class="col-12 col-sm circle empty" id="13"></div>
+                        <div class="col-12 col-sm circle empty" id="12"></div>
+                        <div class="col-12 col-sm circle empty" id="11"></div>
+                        <div class="col-12 col-sm circle empty" id="10"></div>
+                        <div class="col-12 col-sm circle empty" id="9"></div>
+                        <div class="col-12 col-sm circle empty" id="8"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm circle empty" id="7"></div>
+                        <div class="col-12 col-sm circle empty" id="6"></div>
+                        <div class="col-12 col-sm circle empty" id="5"></div>
+                        <div class="col-12 col-sm circle empty" id="4"></div>
+                        <div class="col-12 col-sm circle empty" id="3"></div>
+                        <div class="col-12 col-sm circle empty" id="2"></div>
+                        <div class="col-12 col-sm circle empty" id="1"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bouton pour recommencer -->
+    <button id="recommence" style="display: none;">Recommencer</button>
+</main>
+<br>
+<!-- Inclusion des script JavaScript -->
+<script src="./index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.0/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

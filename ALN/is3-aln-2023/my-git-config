@@ -1,0 +1,27 @@
+#!/bin/sh
+  
+# Pour éviter de devoir entrer trop souvent son identifiant et mot de passe
+git config --global credential.helper cache
+# Il faut éviter certains éditeurs qui ouvrent des fenêtres graphiques. 
+# Vous pouvez changer pour vim ou emacs
+git  config --global core.editor nano
+# Pour rendre certains affichages plus lisibles
+git config --global merge.conflictStyle diff3
+# Pour éviter un message pénible de git
+git config --global pull.rebase false
+# Pour définir l'alias `projet-initial`
+git remote remove projet-initial 2>/dev/null
+git remote add projet-initial https://gitlab.univ-lille.fr/francois.boulier/is3-aln-2023.git
+
+# Pour récupérer les mises-à-jour futures de `projet-initial`
+# git pull projet-initial main
+
+# Rajoute un alias au .bashrc pour mettre de la couleur dans la sortie de ls
+compteur=`grep 'alias ls=' ${HOME}/.bashrc | wc -l`
+if [ ${compteur} -eq 0 ] ; then
+    cp ${HOME}/.bashrc ${HOME}/.bashrc-svg
+    tmpfile=`mktemp`
+    (cat ${HOME}/.bashrc ; echo "alias ls='ls --color=auto'") > ${tmpfile}
+    mv ${tmpfile} ${HOME}/.bashrc
+fi
+
