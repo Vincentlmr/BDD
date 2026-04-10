@@ -1,0 +1,237 @@
+---
+title: "TP1_MA"
+author: "Vincent LE MEUR"
+date: "2024-01-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Compte rendu TP1
+```{r, echo=FALSE,warning=FALSE, include=FALSE}
+library(mvtnorm)
+library(FactoMineR)
+library(factoextra)
+
+```
+
+### 1.1
+
+```{r, echo=TRUE,warning=FALSE}
+n=100
+p=4
+
+set.seed(1234)
+sigma =matrix(c(0.7,0,1.3,0.5,0,1.2,-0.3,-0.1,1.3,-0.3,3.1,1.3,0.5,-0.1,1.3,0.6), nrow = p, ncol = p, byrow = TRUE)
+
+mu = c(1,2,4,3)
+
+
+X=rmvnorm(n,mu,sigma)
+head(X)
+```
+```{r, echo=TRUE,warning=FALSE}
+colMeans(X)
+```
+On remarque que le colMean est proche de $\mu$
+
+### 1.2
+
+```{r, echo=TRUE,warning=FALSE}
+ACP.X = PCA(X, scale.unit = TRUE ,graph = FALSE)
+#scale.unit -> normé
+
+ACP.X$eig
+
+ACP.X$var
+
+fviz_eig(ACP.X,choice = "eigenvalue", addlabels = TRUE )+
+geom_hline (yintercept = 1, linetype = 2, color = "red")
+```
+On garde 2 dimensions
+
+### 1.3
+
+#### Algorythme NIPALS
+
+```{r, echo=TRUE,warning=FALSE}
+NIPALS <- function(X, h = 2, iter = 100) {
+  # renvoie les composantes principales (CP), les facteurs principaux (FP) ET
+  # les données reconstituées avec h composantes (Xrec)
+  n <- nrow(X)
+  p <- ncol(X)
+  # centrer et réduire matrice X
+  m <- apply(X, 2, mean) # calcul des moyennes # m <- colMeans(X)
+  #na.rm permet de ne pas prendre en compte les NA
+  s <- apply(X, 2, sd) * sqrt((n - 1) / n) # calcul des écart-types
+  Xr <- (X - rep(1, n) %*% t(m)) / (rep(1, n) %*% t(s))
+  # autre manière: Xr <- scale(X, center = m, scale = s)
+
+  # on reserve la place pour:
+  CP <- matrix(0, nrow = n, ncol = h) # les composantes principales
+  FP <- matrix(0, ncol = h, nrow = p) # les facteurs principaux
+  Xrec <- matrix(0, nrow = n, ncol = p) # les données reconstituées
+
+  # deroulement de l'algorithme:
+  for (i in 1:h) {
+    # voir pages 30-32 du cours
+    r <- calcul_cp_fp(Xr, iter) # fonction calculant 1ere CP et 1er FP
+    CP[, i] <- r$cp
+    FP[, i] <- r$fp
+    Xr <- Xr - (r$cp) %*% t(r$fp)
+  }
+
+  # Reconstitution des données avec h composantes
+  Xrec <- CP %*% t(FP)
+  Xrec <- Xrec * (rep(1, n) %*% t(s)) + rep(1, n) %*% t(m)
+  return(list(CP = CP, FP = FP, rec = Xrec))
+}
+
+# la fonction qui calcule CP_1 et FP_1
+calcul_cp_fp <- function(X, iter) {
+  cp <- X[, 1]
+  for (i in 1:iter) {
+    fp <- t(X) %*% cp
+    # on normalize fp:
+    fp <- fp / sqrt(sum(fp^2))
+    cp <- X %*% fp
+  }
+  return(list(cp = cp, fp = fp))
+}
+```
+
+### Application de NIPALS aux données simulées
+Voici ce qu'on obtient avec h=4 composantes. À comparer avec ce qui est donné par FactoMineR dans l'objet 'acp'.
+
+```{r, comment=""}
+res <- NIPALS(X, h = ncol(X))
+cat("Les facteurs principaux :\n")
+cat("  NIPALS :\n")
+print(res$FP)
+cat("  FactoMineR :\n")
+print(ACP.X$svd$V)
+cat("\nLes composantes principales :\n")
+cat("  NIPALS :\n")
+print(head(res$CP))
+cat("  FactoMineR :\n")
+print(head(ACP.X$ind$coord))
+```
+
+#### La reconstitution complète des données (toutes les composantes principales)
+
+La reconstitution des données avec toutes les composantes principales.
+
+```{r, comment=""}
+res <- NIPALS(X, h = ncol(X))
+print(head(res$rec))
+print(head(X))
+```
+#### Approximation des données avec quelques composantes (ici h=2)
+
+Voici la reconstitution des données avec juste deux composantes :
+```{r, comment=""}
+res <- NIPALS(X, h = 2)
+cat("Données reconstituées :\n")
+print(head(res$rec))
+cat("Données :\n")
+print(head(X))
+```
+```{r, comment=""}
+NIPALS_dm <- function(X, h = 2, iter = 100) {
+  # renvoie les composantes principales (CP), les facteurs principaux (FP) et
+  # les données reconstituées avec h composantes (Xrec)
+  n <- nrow(X)
+  p <- ncol(X)
+
+  # centrer et réduire matrice X
+  # calcul des moyennes
+  m <- apply(X, 2, mean, na.rm = TRUE) # autre manière: m <- colMeans(X, na.rm = TRUE)
+  # calcul des écart-types
+  s <- apply(X, 2, sd, na.rm = TRUE) * sqrt((n - 1) / n)
+  Xr <- (X - rep(1, n) %*% t(m)) / (rep(1, n) %*% t(s))
+  # autre manière: Xr <- scale(X, center = m, scale = s)
+
+  # on réserve la place pour:
+  CP <- matrix(0, nrow = n, ncol = h) # les composantes principales
+  FP <- matrix(0, ncol = h, nrow = p) # les facteurs principaux
+  Xrec <- matrix(0, nrow = n, ncol = p) # les données reconstituées
+
+  # déroulement de l'algorithme:
+  for (i in 1:h) {
+    # voir pages 30-32 du cours
+    r <- calcul_cp_fp_dm(Xr, iter) # fonction calculant 1ere CP et 1er FP
+    CP[, i] <- r$cp
+    FP[, i] <- r$fp
+    Xr <- Xr - (r$cp) %*% t(r$fp)
+  }
+
+  # Reconstitution des données avec h composantes
+  Xrec <- CP %*% t(FP)
+  Xrec <- Xrec * (rep(1, n) %*% t(s)) + rep(1, n) %*% t(m)
+
+  return(list(CP = CP, FP = FP, rec = Xrec))
+}
+
+# la fonction qui calcule CP_1 et FP_1 avec données manquantes
+calcul_cp_fp_dm <- function(X, iter) {
+  cp <- X[, 1]
+  fp <- rep(0, ncol(X))
+  for (i in 1:iter) {
+    for (j in 1:ncol(X)) {
+      fp[j] <- sum(X[, j] * cp, na.rm = TRUE)
+    }
+    # autre manière qui évite les boucles
+    # manière 1: fp = apply(X, 2, function(x) sum(x * cp, na.rm = TRUE))
+    # manière 2: fp = colSums(X * cp, na.rm = TRUE)
+
+    # on normalize fp
+    fp <- fp / sqrt(sum(fp^2))
+    cp <- apply(X, 1, function(x) sum(x * fp, na.rm = TRUE)) # vectoriser le calcul
+  }
+
+  return(list(cp = cp, fp = fp))
+}
+```
+
+```{r, comment=""}
+res_dm <- NIPALS_dm(X, h = ncol(X))
+cat("Les facteurs principaux :\n")
+print(res_dm$FP)
+cat("Les composantes principales :\n")
+print(head(res_dm$CP))
+cat("Les données reconstituées :\n")
+print(head(res_dm$rec))
+```
+
+#### 1.4
+```{r, comment=""}
+# pourcentage des données manqunates
+pm <- 0.1
+# génération des valeurs manquantes
+# on se rappelle n=100, p=4.
+Xm <- X
+# indices des valeurs manquantes
+im <- which(runif(n * p) < pm)
+Xm[im] <- NA
+summary(Xm)
+cat("Voici les valeurs qui ont été déclarées manquantes :\n")
+print(X[im])
+nb = length(X[im])
+nb
+print(im)
+print(Xm)
+```
+
+#### 1.5
+```{r, comment=""}
+imp_nip <- NIPALS_dm(Xm, h = 4) # par défaut, on utilise donc juste deux comp (h=2)
+h=4
+cat("Voici les valeurs estimées par NIPALS pour les données manquantes :\n")
+print(imp_nip$rec[im])
+
+1/nb*sum((X-imp_nip$rec)**2)
+
+
+```

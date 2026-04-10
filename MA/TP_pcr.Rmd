@@ -1,0 +1,233 @@
+---
+title: "TP 13/02"
+author: "Vincent LE MEUR"
+date: "2024-02-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# TP R : CR, PLS, Ridge et Lasso
+
+## Compte rendu
+
+```{r, echo=FALSE,warning=FALSE, include=FALSE}
+#package
+library(pls)
+help(package = "pls") 
+library(glmnet)
+help(package = "glmnet")
+
+#données
+d = read.table("http://math.univ-lille1.fr/~preda/GIS4/car.txt", header=TRUE, sep="\t", row.names=1)
+str(d)
+summary(d)
+d
+
+car <- read.delim("~/car.txt", row.names=1)
+
+```
+
+
+### Expliquer/prédire
+```{r,warning=FALSE, echo=FALSE}
+d = car[, -c(7,8)]
+
+cat("Regression linéaire :")
+m0 = lm(PRIX~., data = d) # le . remplace toutes les autres variables dans la base d
+summary(m0)
+
+```
+On à un R² pas trop mal et un test global de Fisher nous indiquant que le modèle explique le PRIX de manière significative (p = 0.0156) mieux que le modèle null. Cependant aucune variable n'est significative due à la multicolinéarité
+
+
+
+```{r,warning=FALSE, echo=FALSE}
+cat("ACP :")
+library(FactoMineR)
+acp = PCA(d[,-7], scale=TRUE, graph = FALSE) #-7 : sans la variable PRIX
+print(acp$eig)
+```
+
+VIF pour voir la multicolinéarité (grand)
+
+```{r,warning=FALSE, echo=FALSE, include=FALSE}
+library(knitr)
+library(car)
+a=vif(m0)
+
+
+```
+
+```{r,warning=FALSE, echo=FALSE}
+
+kable(a,caption= "vif")
+
+```
+
+## Solutions à la multicolinéarité: stepAIC, PCR, PLS, Ridge et Lasso
+
+### stepAIC
+
+```{r,warning=FALSE, echo=FALSE}
+
+library(MASS)
+m_aic=stepAIC(m0, trace=0) # pas d'affichage du processus de selection
+summary(m_aic)
+
+```
+Ce sont les variables PUIS et POIDS qui sont sélectionnées par le stepAIC (stratégie backward), avec seul la variable PUIS significative. C’est un modèle assez propre car on peut vérifier que les conditions d’application sont vérifiées (normalité, homoscédasticité et indépendance des résidus)
+
+#### Erreur de prédiction par validation croisée
+
+$$MSEP : \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i^{(-i)})^{2}$$
+
+$$RMSEP :  \sqrt{MSEP}$$
+```{r,warning=FALSE, echo=FALSE}
+
+rmsep=function(fit){
+h=lm.influence(fit)$h
+return(sqrt(mean((residuals(fit)/(1-h))^2)))
+}
+print("RMSEP:")
+print("aic:") 
+rmsep(m_aic)
+print("m0:") 
+rmsep(m0)
+
+```
+## Régression sur les composantes principales (PCR)
+
+```{r,warning=FALSE, echo=FALSE}
+
+#Regression
+
+library(pls)
+m_pcr=pcr(PRIX~., scale=TRUE, validation="LOO", jackknife = TRUE, data=d)
+plot(m_pcr,"validation", estimate = c("train", "CV"), legendpos = "topright")
+summary(m_pcr)
+
+```
+
+```{r,warning=FALSE, echo=FALSE}
+
+obsfit = predplot(m_pcr, ncomp=1, which = "validation", asp=1,line=TRUE, main="Predicted vs Observed : 1 cp",label= rownames(d))
+points(obsfit, pch=16, col="red")
+
+coefplot(m_pcr, ncomp=1, se.whiskers = TRUE, labels = prednames(m_pcr), cex.axis = 0.5)
+```
+On obtient l'intercept avec:
+
+```{r,warning=FALSE, echo=FALSE}
+
+coef(m_pcr, ncomp=1, intercept=TRUE)
+```
+Ces coefficents sont cependant ceux obtenus avec les variables réduites (mais pas centrées
+
+```{r,warning=FALSE, echo=FALSE}
+
+sds = apply(d,2, "sd" ) # calcul des ecart-types de chaque variable
+coef(m_pcr, ncomp=1, intercept=TRUE)[2:7]/sds[-7] #pour avoir les coefs des variables d'origine 
+```
+
+Le modèle de régression obtenu est donc :
+$$PRIX = -43286.46 +2.75CYL +49.98PUIS + 46.03LON +175.80LAR + 7.59POIDS + 71.38VITESSE + erreu r$$
+
+Les coefficients sont positifs : Plus la voiture a des caractéristiques élévées, plus elle est chèr
+
+
+#### Prédictions 
+```{r,warning=FALSE, echo=FALSE}
+
+dtest = data.frame(CYL=c(1600), PUIS = c(100), LON=c(450), LAR=c(180), POIDS=c(1400), VITESSE = c(160))
+print(dtest)
+
+predict(m_pcr, comps=1, newdata=dtest)
+```
+
+### Prédiction PLS
+
+```{r,warning=FALSE, echo=FALSE}
+#Regresson
+m_pls=plsr(PRIX~., scale=TRUE, validation="LOO", jackknife = TRUE, data=d)
+summary(m_pls)
+
+```
+On trouve que le modèle avec une composante PLS nous fournit la meilleure prédiction en termes de RMSEP
+avec une valeur de : 4502 ! Moins bien que PCR en termes de RMSEP mais mieux en termes de R2 : 0.5957
+pour la PCR et 0.6064 pour la PLS.
+
+#### RIDGE regression 
+
+```{r,warning=FALSE, echo=FALSE}
+X = model.matrix(PRIX~., d)[,-1] # on met les predicteurs sous la forme d'une matrice. Si des variabl
+Y =d$PRIX # la variable réponse
+
+library(glmnet)
+#choisisons le lambda qui minimise le RMSEP (ou equivalent, la cross-validation = MSEP):
+
+cv_fit <- cv.glmnet(X,Y, alpha = 0, lambda = seq(0,10, 0.1), grouped = FALSE, nfolds =nrow(d))
+plot(cv_fit, main = "Choix de lambda")
+
+```
+
+On observe que la décroissance de l’erreur de prédiction n’est pas assez prononcée, du coup, on élargi
+l’intervalle de lambda ! Posons lambda = seq(0,100000, 10)
+
+```{r,warning=FALSE, echo=FALSE}
+cv_fit <- cv.glmnet(X,Y, alpha = 0, lambda = seq(0,100000, 10), grouped = FALSE, nfolds =nrow(d))
+plot(cv_fit, main = "Choix de lambda")
+
+# On observe sur ce graph la valeur de lambda qui minimise l’erreur de prediction. On l’obtient avec :
+lambda_optimal = cv_fit$lambda.min
+
+
+MSEP= min(cv_fit$cvm)
+
+      
+rmsep_ridge =sqrt(min(cv_fit$cvm))
+
+```
+
+On trouve la valeur optimale : lambda_optimal=`r lambda_optimal` pour laquelle on obtient une MSEP égale à `r MSEP`
+ce qui correspond à un RMSEP = sqrt(MSEP) = `r rmsep_ridge`
+
+```{r,warning=FALSE, echo=FALSE}
+
+
+# Les coefficients du modèle Ridge optimal sont données par :
+m_ridge <- glmnet(X,Y, alpha = 0, lambda = lambda_optimal)
+coef(m_ridge) # pour voir les coefficients
+```
+ Ridge fait moins bien que PLS et PCR
+ 
+ ### LASSO
+ 
+ On fait la même chose que pour Ridge en prenant $\alpha$=1
+ 
+```{r,warning=FALSE, echo=FALSE}
+ cv_fit <- cv.glmnet(X,Y, alpha = 1, lambda = seq(0,100000, 10), grouped = FALSE, nfolds =nrow(d))
+plot(cv_fit, main = "Choix de lambda")
+
+# On observe sur ce graph la valeur de lambda qui minimise l’erreur de prediction. On l’obtient avec :
+lambda_optimal = cv_fit$lambda.min
+print(lambda_optimal)
+
+MSEP= min(cv_fit$cvm)
+      
+rmsep_lasso =sqrt(min(cv_fit$cvm))
+
+m_lasso <- glmnet(X,Y, alpha = 1, lambda = lambda_optimal)
+coef(m_lasso)
+
+```
+On trouve la valeur optimale : lambda_optimal=`r lambda_optimal` pour laquelle on obtient une MSEP égale à `r MSEP`
+ce qui correspond à un RMSEP = sqrt(MSEP) = `r rmsep_lasso`
+
+Le RMSEP de Lasso est le meilleur parli les modèle PCR,PLS et Ridge.
+Il selectionne les mêmes variables que stepAIC mais ne le bat pas en termes de prédiction
+
+
+

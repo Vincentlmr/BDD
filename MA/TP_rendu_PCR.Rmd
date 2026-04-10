@@ -1,0 +1,213 @@
+---
+title: "TP_PCR_RIDGE_LASSO_PLS_rendu"
+author: "Vincent LE MEUR"
+date: "2024-02-21"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# TP R : CR, PLS, Ridge et Lasso
+
+## Compte rendu
+
+```{r, echo=TRUE,warning=FALSE, include=FALSE}
+#package
+library(pls)
+library(MASS)
+library(glmnet)
+library(readr)
+library(FactoMineR)
+library(car)
+library(knitr)
+
+d <- read_table("tp_ma.txt")
+summary(d)
+str(d)
+
+```
+On étudi les données des 12 melanges d’essence.
+
+## Expliquer et prédire les composants des mélanges
+
+```{r, echo=TRUE,warning=FALSE}
+
+
+m0 = lm(y~., data = d) # le . remplace toutes les autres variables dans la base d
+summary(m0)
+```
+
+Un bon $R^2$ mais on à Cependant aucune variable n'est significative ce qui est un signe de multicolinéarité.
+
+```{r, echo=TRUE,warning=FALSE}
+
+acp = PCA(d[,-8], scale=TRUE, graph = FALSE)
+print(acp$eig)
+```
+
+En effet les 2 dernières composantes sont proches de 0 ce qui peut explique la multicolinéarité
+
+Autre méthode (VIF)
+
+```{r, echo=TRUE,warning=FALSE}
+
+a= vif(m0)
+
+
+kable(a,caption= "vif")
+
+```
+On à des valeurs de VIF très élevés ce qui indique une multicolinéarité
+
+
+## Solution à la multicolinéarité
+
+### StepAIC
+
+```{r, echo=TRUE,warning=FALSE}
+m_aic=stepAIC(m0, trace=0) # pas d'affichage du processus de selection
+summary(m_aic)
+```
+On sait que: 
+$$MSEP : \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i^{(-i)})^{2}$$
+et que: 
+$$RMSEP :  \sqrt{MSEP}$$
+```{r, echo=TRUE,warning=FALSE}
+rmsep=function(fit){
+h=lm.influence(fit)$h
+return(sqrt(mean((residuals(fit)/(1-h))^2)))
+}
+rmsep=rmsep(m_aic)
+```
+
+Ici on à un RMSEP de `r rmsep` pour le moèle aic
+
+## PCR
+
+```{r, echo=TRUE,warning=FALSE}
+m_pcr=pcr(y~., scale=TRUE, validation="LOO", jackknife = TRUE, data=d)
+
+#Courbe
+plot(m_pcr,"validation", estimate = c("train", "CV"), legendpos = "topright")
+summary(m_pcr)
+```
+On choisira donc 6 composantes qui nous assure un RMSEP = 6.347.
+
+Voici les prédictions graphiquement (obtenues par validation croisée) :
+
+```{r, echo=TRUE,warning=FALSE}
+obsfit = predplot(m_pcr, ncomp=1, which = "validation", asp=1,line=TRUE, main="Predicted vs Observed  :1 cp",label= rownames(d))
+points(obsfit, pch=16, col="red")
+obsfit
+
+```
+
+```{r, echo=TRUE,warning=FALSE}
+#Les coefficients et leur significativité est obtenue avec :
+coefplot(m_pcr, ncomp=6, se.whiskers = TRUE, labels = prednames(m_pcr), cex.axis = 0.5)
+
+jack.test(m_pcr, ncomp=6)
+
+#L’intercept est obtenu avec :
+
+coef(m_pcr, ncomp=6, intercept=TRUE)
+```
+
+
+Ces coefficents sont cependant ceux obtenus avec les variables réduites (mais pas centrées), car ACP normée
+au départ. Les coefficients des variables d’origine sont donc 
+
+```{r, echo=TRUE,warning=FALSE}
+sds = apply(d,2, "sd" ) # calcul des ecart-types de chaque variable
+a=coef(m_pcr, ncomp=6, intercept=TRUE)/sds[-8] #pour avoir les coefs des variables d'origine
+
+a
+```
+
+Le modèle de régression obtenu est donc :
+
+$$y = `r a[1]`  `r a[2]` x1  `r a[3]` x2 + `r a[4]` x3  `r a[5]` x4  `r a[6]` x5  `r a[7]` x6  `r a[8]` x7 + erreur$$
+
+L'essence 3 a des coéfficients positifs donc plus il est présent plus l'indice d'octane moteur est élevé
+
+
+### Prédiction PLS
+
+```{r,warning=TRUE, echo=FALSE}
+
+### Prédiction PLS
+m_pls=plsr(y~., scale=TRUE, validation="LOO", jackknife = TRUE, data=d)
+summary(m_pls)
+```
+
+On a un RMSEP de 6.359
+
+#### RIDGE regression 
+
+```{r,warning=FALSE, echo=FALSE}
+X = model.matrix(y~., d)[,-1] # on met les predicteurs sous la forme d'une matrice. Si des variabl
+Y =d$y# la variable réponse
+
+library(glmnet)
+#choisisons le lambda qui minimise le RMSEP (ou equivalent, la cross-validation = MSEP):
+
+cv_fit <- cv.glmnet(X,Y, alpha = 0, lambda = seq(0,100000, 10), grouped = FALSE, nfolds =nrow(d))
+plot(cv_fit, main = "Choix de lambda")
+
+lambda_optimal = cv_fit$lambda.min
+
+
+MSEP= min(cv_fit$cvm)
+
+      
+rmsep_ridge =sqrt(min(cv_fit$cvm))
+```
+
+On trouve la valeur optimale : lambda_optimal=`r lambda_optimal` pour laquelle on obtient une MSEP égale à `r MSEP`
+ce qui correspond à un RMSEP = sqrt(MSEP) = `r rmsep_ridge`
+
+
+### LASSO
+ 
+ On fait la même chose que pour Ridge en prenant $\alpha$=1
+ 
+```{r,warning=FALSE, echo=FALSE}
+ cv_fit <- cv.glmnet(X,Y, alpha = 1, lambda = seq(0,100000, 10), grouped = FALSE, nfolds =nrow(d))
+plot(cv_fit, main = "Choix de lambda")
+
+# On observe sur ce graph la valeur de lambda qui minimise l’erreur de prediction. On l’obtient avec :
+lambda_optimal = cv_fit$lambda.min
+print(lambda_optimal)
+
+MSEP= min(cv_fit$cvm)
+      
+rmsep_lasso =sqrt(min(cv_fit$cvm))
+
+m_lasso <- glmnet(X,Y, alpha = 1, lambda = lambda_optimal)
+coef(m_lasso)
+```
+
+On trouve la valeur optimale : lambda_optimal=`r lambda_optimal` pour laquelle on obtient une MSEP égale à `r MSEP`
+ce qui correspond à un RMSEP = sqrt(MSEP) = `r rmsep_lasso`
+
+## Conclusion:
+
+
+```{r,warning=FALSE, echo=FALSE}
+# Données
+methodes <- c("StepAIC", "ACR", "PLS", "RIDGE", "Lasso")
+RMSEP <- c(1.2870976, 6.347, 6.359, 5.1544438, 6.811245)
+
+# Création du dataframe
+df <- data.frame(Méthode = methodes, RMSEP = RMSEP)
+
+# Affichage du tableau
+kable(df, caption = "RMSEP pour différentes méthodes")
+
+```
+
+Le meilleur modèle prédictif est le Lasso avec un RMSEP de 6.8

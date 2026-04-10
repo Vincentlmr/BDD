@@ -1,0 +1,210 @@
+---
+title: "tp_imp_mult"
+author: "Vincent LE MEUR"
+date: "2024-03-05"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r TRUE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, echo=TRUE,warning=FALSE, include=FALSE}
+
+library(mice) # charge la librairie mice
+library(VIM)
+library(lattice)
+library(pROC)
+library(ggpubr)
+
+```
+
+
+
+```{r, echo=TRUE,warning=FALSE, include=FALSE}
+library(readr)
+tib_skul <- read_delim("tibetan_skull_missing.csv", 
+    delim = ";", escape_double = FALSE, trim_ws = TRUE)
+d = data.frame(tib_skul) #c'est une base de donnée pré-installée avec R
+str(d) # affiche la structure (le type) des données
+d$type = as.factor(d$type) # on les met en facteur
+
+```
+
+### Statistique univarié des données
+
+```{r, echo=TRUE,warning=FALSE, include=TRUE}
+
+summary(d)
+```
+On remarque que toutes less variables ont des valeurs manquantes ( 3 pour length, 1 pour breadth et height et 2 pour face_height et face_breadth)
+
+
+# Statistiques bivariées
+
+```{r, echo=TRUE,warning=FALSE, include=FALSE}
+
+# Boucle pour calculer les statistiques sommaires pour chaque variable
+for (col in c("length", "breadth", "height", "face_height", "face_breadth")) {
+  # Filtrer les données pour supprimer les valeurs manquantes
+  filtered_data <- na.omit(d[c("type", col)])
+  
+  # Calculer les statistiques sommaires
+  summary_stats <- aggregate(formula(paste(col, "~ type")), data = filtered_data, FUN = function(x) c(Mean = mean(x), SD = sd(x)))
+  
+  # Afficher les résultats
+  print(summary_stats)
+  
+  # Créer un graphique boxplot
+  bxp <- ggboxplot(filtered_data, x = "type", y = col, 
+                    color = "type", 
+                    palette = c("#00AFBB", "#E7B800"),
+                    add = "jitter", 
+                    ylab = col,
+                    xlab = "Type",
+                    title = paste("Boxplot of", col, "by Type"))
+  
+  # Afficher le graphique
+  print(bxp)
+  t_test_result <- t.test(filtered_data[[col]] ~ filtered_data$type)
+  print(col)
+  print(t_test_result)
+}
+```
+    Length :
+        Le test t de Welch sur la longueur (length) montre une différence significative entre les groupes A et B (p-value = 0.000482). La moyenne dans le groupe A est de 174.75, tandis que dans le groupe B, elle est de 186.54. L'intervalle de confiance à 95% pour la différence de moyennes est de -17.85 à -5.72.
+
+    Breadth :
+        Le test t de Welch sur la largeur (breadth) ne montre pas de différence significative entre les groupes A et B (p-value = 0.7232). Les moyennes dans les groupes A et B sont respectivement de 139.67 et 138.73. L'intervalle de confiance à 95% pour la différence de moyennes est de -4.42 à 6.29.
+
+    Height :
+        Le test t de Welch sur la hauteur (height) ne montre pas de différence significative entre les groupes A et B (p-value = 0.2085). Les moyennes dans les groupes A et B sont respectivement de 132.00 et 134.93. L'intervalle de confiance à 95% pour la différence de moyennes est de -7.59 à 1.73.
+
+    Face Height :
+        Le test t de Welch sur la hauteur du visage (face_height) montre une différence significative entre les groupes A et B (p-value = 0.0001778). La moyenne dans le groupe A est de 69.40, tandis que dans le groupe B, elle est de 76.46. L'intervalle de confiance à 95% pour la différence de moyennes est de -10.40 à -3.73.
+
+    Face Breadth :
+        Le test t de Welch sur la largeur du visage (face_breadth) montre une différence significative entre les groupes A et B (p-value = 0.01291). La moyenne dans le groupe A est de 130.50, tandis que dans le groupe B, elle est de 137.18. L'intervalle de confiance à 95% pour la différence de moyennes est de -11.79 à -1.57.
+
+```{r, echo=TRUE,warning=FALSE, include=TRUE}
+
+md.pattern(d)
+
+```
+
+On observe qu'il y à 23 observations avec 0 donnéess manquantes, 3 avec 1 pour lenghts, 1 avec 1 pour face_breath, 2 avec 1 pourface_height, 1 avec 1 pour type, 1 avec 1 pour height et 1 avec 2 pour breadth et face_breadth
+
+```{r, echo=TRUE,warning=FALSE, include=TRUE}
+
+marginplot(tib_skul[, c("type","breadth")], col = mdc(c("obs", "mis")), cex = 1.2, cex.lab = 1.2,pch=19)
+marginplot(tib_skul[, c("type","height")], col = mdc(c("obs", "mis")), cex = 1.2, cex.lab = 1.2,pch=19)
+marginplot(tib_skul[, c("type","face_height")], col = mdc(c("obs", "mis")), cex = 1.2, cex.lab = 1.2,pch=19)
+marginplot(tib_skul[, c("type","face_breadth")], col = mdc(c("obs", "mis")), cex = 1.2, cex.lab = 1.2,pch=19)
+marginplot(tib_skul[, c("type","length")], col = mdc(c("obs", "mis")), cex = 1.2, cex.lab = 1.2,pch=19)
+
+```
+
+Boxplot assez proche (pour une valeur manquante) on peut utiliser MICE
+
+## Imputation des données manquantes
+
+## Regression logistique
+
+### On complete Donnéess manquantes avec MICE:
+
+```{r, echo=TRUE,warning=FALSE, include=TRUE}
+
+dm = mice(d, m = 5, seed=10, print = FALSE, maxit = 50)
+summary(dm)
+
+```
+La méthode pmm est utilisé pour imputer les différentes variables en se basant sur la moyenne prédite
+
+
+On peut observer les données imputées:
+```{r, echo=TRUE,warning=FALSE, include=TRUE}
+print(dm$imp)
+
+```
+```{r, echo=TRUE,warning=FALSE, include=TRUE}
+
+d1 = complete(dm,1)
+summary(d1)
+d2 = complete(dm,2)
+summary(d2)
+d3 = complete(dm,3)
+summary(d3)
+d4 = complete(dm,4)
+summary(d4)
+d5 = complete(dm,5)
+summary(d5)
+```
+On observe une très légère différence au niveau de la moyenne et de la médiane pour les 5 différents jeux
+
+
+### Représentation graphique des données imputées:
+```{r, echo=TRUE,warning=FALSE, include=TRUE}
+
+stripplot(dm, pch = 20, cex = 1.2)
+
+xyplot(dm, type ~ length|.imp, pch = 20, cex = 1.4)
+
+par(mfrow=c(1,2))
+hist(d[,1], col="lightblue", probability = TRUE, xlab = "type", main = "type")
+hist(d1[,1], density = 2, add= TRUE, border = "red", probability = TRUE, col ="red")
+
+hist(d[,2], col="lightblue", probability = TRUE, xlab = "length", main = "length")
+hist(d1[,2], density = 2, add= TRUE, border = "red", probability = TRUE, col ="red")
+
+
+```
+
+Pour chaque jeu de données parmi les 5, on peut regarder l'évolution de la moyenne et l'écart type lors du processus itératif entre lenght et breatdh
+
+```{r, echo=TRUE,warning=FALSE, include=TRUE}
+plot(dm, c("type", "length"))
+```
+
+
+
+```{r, echo=TRUE,warning=FALSE, include=TRUE}
+
+logit_model <- glm(type ~ breadth + height + face_breadth + face_height, data = d1, family = binomial(link = "logit"))
+summary(logit_model)
+        
+```
+- breadth : -0.2267. Chaque augmentation d'une unité de la variable 'breadth' est associée à une diminution de l'odds ratio de 0.2267, bien que cela ne soit pas statistiquement significatif à un niveau de confiance de 95% (p-value = 0.0663).
+
+- height : 0.1048. Chaque augmentation d'une unité de la variable 'height' est associée à une augmentation de l'odds ratio de 0.1048, mais cela n'est pas statistiquement significatif (p-value = 0.3031).
+
+- face_breadth : 0.2387. Chaque augmentation d'une unité de la variable 'face_breadth' est associée à une augmentation de l'odds ratio de 0.2387, bien que cela ne soit pas statistiquement significatif (p-value = 0.1181).
+
+- face_height : 0.4888. Chaque augmentation d'une unité de la variable 'face_height' est associée à une augmentation de l'odds ratio de 0.4888, et cela est statistiquement significatif à un niveau de confiance de 95% (p-value = 0.0439). Cela suggère que 'face_height' a une influence significative sur la probabilité de 'type'
+
+## Courbe ROC
+
+```{r, echo=TRUE,warning=FALSE, include=TRUE}
+
+predictions <- predict(logit_model, d1, type = "response")
+roc_obj <- roc(d1$type, predictions)
+
+plot(roc_obj, main = "Courbe ROC du Modèle Logistique", col = "blue", lwd = 2)
+abline(a = 0, b = 1, col = "red", lty = 2, lwd = 2)  # Ligne de référence
+        
+```
+
+## Calcul du taux de mal-classés avec un seuil de décision de 0.5
+
+```{r, echo=TRUE,warning=FALSE, include=TRUE}
+
+threshold <- 0.5
+predicted_class <- ifelse(predictions >= threshold, "B", "A")
+misclassification_rate <- mean(predicted_class != d1$type)
+cat("Taux de mal-classés (seuil de décision = 0.5):", misclassification_rate, "\n")
+
+        
+```
+

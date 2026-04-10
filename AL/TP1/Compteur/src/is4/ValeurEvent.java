@@ -1,0 +1,17 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package is4;
+
+/**
+ *
+ * @author vlemeur
+ */
+import java.util.EventObject ;
+
+public class ValeurEvent extends EventObject {
+    public ValeurEvent(CompteurBean src){ super(src);}
+}
+    
+

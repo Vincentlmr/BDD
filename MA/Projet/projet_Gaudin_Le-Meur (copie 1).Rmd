@@ -1,0 +1,527 @@
+---
+title: "Projet_MA_vins_Gaudin_Le-Meur"
+date: "2024"
+
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+  includes:
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+\newpage
+
+```{r, echo=TRUE,include=FALSE}
+library(knitr)
+library(readxl)
+library(corrplot)
+library(FactoMineR)
+library(factoextra)
+library(Hmisc)
+library(rpart)
+library(tree)
+library(leaps)
+library(performance)
+library(see)
+library(gridExtra)
+```
+
+
+
+# Introduction
+
+## Sujet
+
+**Fichier** : *vins.xls* 
+
+La consommation de plusieurs types de vins (exprimee en KiloLitres/an) est observee dans plusieurs pays. 
+
+**Objectif** : Analyse descriptive multivariée, classification des pays. 
+
+## Importation des données
+
+Dans un premier temps on importe les données en ajoutant les noms de vins comme titre des lignes: 
+
+
+```{r}
+vins <- read_excel("vins.xls")
+vins=t(vins)
+d<-vins[2:9,]
+colnames(d)=vins[1,1:18]
+d<-as.data.frame(d)
+nomcol=colnames(d)
+for (i in nomcol){
+  d[,i]=as.integer(d[,i])
+}
+
+
+```
+```{r}
+head(d)
+```
+
+```{r}
+str(d)
+```
+
+# I Analyse univariée
+
+## Summary
+
+Pour commencer l'analyse univarié on regarde le *summary*:
+
+
+```{r}
+stat_uni = function(x)
+{
+return(c(
+
+min(x, na.rm=TRUE),
+max(x, na.rm=TRUE),
+mean(x, na.rm=TRUE),
+median(x, na.rm=TRUE),
+quantile(x, 0.25, na.rm=TRUE),
+quantile(x,0.75, na.rm=TRUE),
+sd(x, na.rm=TRUE)))
+}
+res_stat_uni = apply(d, 2, "stat_uni")
+row.names(res_stat_uni) = c( "Min", "Max", "Moyenne", "Mediane", "Quantile 1", "Quantile 3", "Ecart-type")
+#print(round(t(res_stat_uni),3))
+knitr::kable(round(t(res_stat_uni),3), format = "markdown", align = 'r')
+```
+
+## Histogrammes
+Esnuite on peut aussi observer les différents *Histogrammes*:
+```{r}
+par(mfrow=c(2,5))
+for(i in 2:ncol(d))
+{
+hist(d[,names(d)[i]], xlab = names(d)[i], ylab = "fréquence", col = "blue", main = names(d)[i])
+}
+```
+
+## Boxplots
+
+
+Et enfin des *Boxplots* peuvent être crées :
+
+
+```{r,echo=FALSE}
+par(mfrow = c(2,5))
+for (i in 1:10){
+  boxplot(d[i],main=names(d[i]))
+}
+
+```
+
+
+
+```{r,echo=FALSE}
+par(mfrow = c(2,5))
+for (i in 11:18){
+  boxplot(d[i],main=names(d[i]))
+}
+```
+
+
+## Interprétation
+
+
+Dans un premier temps on observe qu'il n'y à pas de données manquantes. De plus les valeurs vont de *0* comme *minimum* à *191140* comme *maximum* (AUTRE_VDQS). 
+Ensuite on remarque que La moyenne des mesures varie fortement selon les catégories de vin, allant de 0 à 52982.75, et de même la médiane varie aussi en fonction des catégories de vin, ce qui indique une certaine asymétrie dans les distributions. 
+Pour terminer l'écart-type représente la dispersion des données autour de la moyenne, ces valeurs varient considérablement selon les catégories de vin, suggérant des degrés différents de dispersion ou de variabilité des données.
+
+**Conclusion**:
+Pour résumer, l'analyse univariée met en évidence des écarts significatifs dans les mesures statistiques observées pour chaque catégorie de vin. Ces différences peuvent être attribuées aux caractéristiques uniques et aux volumes de production spécifiques à chaque type de vin.
+
+# II Analyse multivariée
+
+## Coéfficients de corrélation
+
+Afin de voir les relations entre les différentes variables, et dans le but de ne pas avoir de colinéarité dans les futurs modèles, on commence par afficher la matrice des corrélations.
+
+```{r}
+cor=cov.wt(d, method="ML", cor=TRUE)$cor
+cor<-as.data.frame(cor)
+```
+
+
+```{r,echo=FALSE}
+kable(round(cor[1:9],2), format="markdown")
+kable(round(cor[10:18],2), format="markdown")
+```
+
+```{r}
+corr<-cor(d, method="pearson")
+corrplot(corr, type="upper", order="hclust", tl.col="black", tl.srt=45)
+```
+
+On caractérise ici une corrélation forte comme étant supérieure à 0.8, ou inférieure à -0.8. On a donc des fortes corrélations positives entre les variables   
+```{r,echo=FALSE}
+correlation_data <- data.frame(
+  Var1 = c("VDQS", "ANJOU", "RHONE", "MUSCAT", 
+             "ANJOU", "ALSACE", "AUTRE_VDQS", 
+             "AUTRE_VDQS", "AUTRE_VDQS", "GIRONDE", 
+             "ANJOU", "GIRONDE", "MOUSSEAU_SIMPLE", "ALSACE"),
+  var2=c("TRES_FORT","AOC_FORT","AOC_AUTRE","AOC_FORT","MUSCAT","PROVENCE","MOUSSEAU_SIMPLE","ALSACE","BOJOLAIS","VDQS","VDQS","AOC_AUTRE","BOJOLAIS","BOJOLAIS"),
+  Correlation = c(0.82, 0.95, 0.84, 1, 0.95, 0.89, 0.93, 0.88, 0.93, 0.93, 0.84, 0.93, 0.91, 0.89)
+)
+
+# Afficher le tableau
+kable(correlation_data, format="markdown")
+```
+
+Toutes les fortes corrélations sont positives, de plus, presque tout les coefficients de corrélation sont positifs. Ceci signifie que lorsqu'un pays consomme plus un type de vin qu'un autre pays, il a aura aussi un consommation supérieure sur les autres types de vin.
+
+## ACP
+
+### Choix du nombre de dimensions de l'ACP
+
+Afin de réaliser une ACP sur les différents pays consommateurs de vin, on commence par calculer les valeurs propres des variables d'intérêt.
+
+```{r}
+A = PCA(d, scale.unit=TRUE,graph=FALSE)
+eig=A$eig
+
+kable(eig, format="markdown")
+```
+
+Selon le critère de Kaiser, les 80% d'inertie totale sont atteints à partir de la 3ème dimension. Il y aurait donc 3 dimensions à garder pour faire notre ACP.
+Nous allons cependant afficher le graphique des valeurs propres pour valider cette hypothèse.
+
+```{r}
+fviz_eig(A,choice = "eigenvalue", addlabels = TRUE )+
+geom_hline (yintercept = 1, linetype = 2, color = "red")
+barplot(A$eig[,3]) +
+lines(c(0,20),c(80,80),type = "l", lty=2,col="red")
+```
+
+On ne retient pas le critère du coude, car cela nous ferait prendre 2 dimensions, qui ne seraient pas suffisantes pour retranscrire l'information.
+On ne retient pas non plus la méthode de Cattel, consistant à prendre 4 dimensions car il y a 4 valeurs propres supérieures ou égales à 1. En effet, il est préférable de garder un modèle simple en ne gardant que les axes utiles.
+
+Nous allons donc prendre 3 axes, comme cela a été trouvé avec le pourcentage d'inertie.
+
+### Afficher les cordonnées, les corrélations, les cosinus carrés (qualité de la représentation) et les contributions de chaque variable (média publicitaire) par rapport aux cinq premières composantes principales. 
+
+```{r}
+kable(A$var$coord[,1:3], format="markdown", caption = "coord")
+kable(A$var$cos2[,1:3], format="markdown", caption = "cos2")
+kable(A$var$contrib[,1:3], format="markdown", caption = "contrib")
+```
+
+
+**Axe 1** :
+L'axe 1 de l'ACP révèle une forte contributions de vins de Gironde, des VDQS et des vins AOC_AUTRES. Ces trois variables sont aussi les mieux représentées sur les axes, puisque ce sont celles ayant le cos2 le plus élevé. De plus, toutes les coordonnées sont positives, entrainant un effet taille sur les données. Ceci signifie que lorqu'un pays consomme beaucoup ces trois types de vins, il aura tendance à beaucoup consommer les autres types de vins.
+
+**Axe2** : 
+On remarque une forte contribution des vins d'Alsace, de Provence, du Muscat et des vins AOC_FORT sur l'axe 2. En revanche, les variables les mieux représentées sur cette dimension sont les vins d'Alsace et de Provence. De plus, cette dimension met en opposion les vins d'Alsace et de Provence, ayant des coordonnées positives, au Muscat, ayant une coordonnée négative.
+Cet axe oppose donc les pays consommant beaucoup de vin d'Alsace et de Provence aux pays consommant beaucoup de Muscat.
+
+**Axe3**:
+Sur l'axe 3, on remarque une forte contribution des vins du Rhone, de Rhon et des vins AUTRE_FORT. Cependant, seuls les variables AUTRE_FORT et Rhone ont un cos2 élevé, entrainant une meilleure représentativité. Enfin, les coordonnées associées à ces 3 variables sont positives, ce qui signifie que si un pays consomme beaucoup un de ces 3 types de vin, il aura tendance à beaucoup consommer les 2 autres.
+
+
+### Représentation des types de vins (cercle des corrélations) par rapport aux composantes principales 1 et 2 et analyser le graphique
+
+```{r}
+plot.PCA(A, axes=c(1,2), choix="var")
+```
+
+Comme dit précédemment, toutes les coordonnées ont une coordonée positive sur l'axe 1, entrainant un effet taille important. Tandis que la dimension 22 oppose bien les pays consommant beaucoup de vin d'Alsace et de Provence aux pays consommant beaucoup de Muscat et de vin AOC_Fles pays consommant beaucoup de vin d'Alsace et de Provence aux pays consommant beaucoup de Muscat et d'AOC_FORT.
+
+### Représentation des types de vins (cercle des corrélations) par rapport aux composantes principales 1 et 3 et analyser le graphique
+
+```{r}
+plot.PCA(A, axes=c(1,3), choix="var")
+```
+
+Ici, on remarque que comme dit précédement, les vins du Rhone, de Rhon et des vins AUTRE_FORT sont les mieux représentés sur la dimension 3. Dans une certaine mesure, ces vins peuvent être opposé au CHMPAGNE qui a une coordonnée négative élevée sur la dimension 3.
+
+### Représentation de la répartition des pays par rapport aux composantes principales 1 et 2 et analyser le graphique
+
+```{r}
+plot.PCA(A, axes=c(1,2), choix="ind")
+```
+
+
+### Interprétation:
+
+**Axe 1** :
+L'axe 1 oppose les pays UK et RFA à l'Italie, le Canada et la Suisse. On peut donc penser que, compte tenu de l'effet taille observé auparavant, cet axe oppose les pays consommant beaucoup de vins tels que UK et RFA aux pays en consommant peu tels que l'Italie, le Canada et la Suisse.
+
+**Axe2** :
+L'axe 2 oppose UK à RFA, tous les autres pays sont proches de 0 sur cette dimension. Ceci signifie que la RFA consomme beaucoup de vins d'Alsace et de Provence, tandis que UK consomme plutot du muscat
+
+### Représentation de la répartition des pays par rapport aux composantes principales 1 et 3 et analyser le graphique
+
+```{r}
+plot.PCA(A, axes=c(1,3), choix="ind")
+```
+
+### Interprétation:
+
+**Axe 1** :
+Comme dit précédement, l'axe 1 oppose majoritairement les pays consommant beaucoup de vins (UK et RFA) à ceux en consommant peu (Italie, Suisse et Canada).
+
+
+**Axe 3** : 
+Sur l'axe 3, on remarque notamment que Nederland a une coordonnée très élevée sur cette dimension. Ceci signifie que ce pays consomme beaucoup de vin du Rhone, de Rhon et des vins AUTRE_FORT. Ce pays s'oppose à UK et USA, qui consommeraient peu de ces 3 vins.
+
+# III Classification des pays
+
+Afin de classifier les pays, plusieurs méthodes peuvent être utilisées.
+
+## Classification ascendante hierarchique
+
+La Classification Ascendante Hiérarchique (CAH) est une méthode de clustering qui regroupe les données en fonction de leur similarité, formant une hiérarchie de clusters. Elle commence en considérant chaque observation comme un cluster individuel puis fusionne progressivement les clusters les plus similaires jusqu'à ce qu'un seul cluster global soit obtenu.
+
+
+Dans un premier temps nous allons chercher le nombre de cluster à utiliser.
+```{r}
+CAH=HCPC(A, nb.clust=-1, graph=FALSE)
+CAH$data.clust$clust
+```
+
+```{r}
+plot(CAH, choice="bar")
+plot(CAH, choice="tree")
+```
+
+On observe avec les diagrammes en bar et en arbre, qu'ici nous pouvons utiliser **4 clusters**.
+
+### Caractériser chaque classe à l’aide des composantes principales utilisées
+
+```{r}
+CAH$desc.axes
+plot(CAH, choice="map", draw.tree = F)
+```
+
+
+```{r}
+CAH$desc.var
+```
+
+
+
+- Les valeurs d'Eta2 indiquent la force de la relation entre chaque catégorie de vin et les variables quantitatives. Une valeur proche de 1 indique une forte association.
+- Les p-valeurs indiquent si la relation est significative. Des p-valeurs faibles (inférieures à 0,05) indiquent une relation significative.
+
+Ici, il y à une forte association entre les variables quantitatives et les différentes catégories des lusters, de même, les différentes relations sont significatives.
+
+
+On retrouve comme classification:
+
+- **Cluster 1** : Ce cluster comprend les pays: Italie, Suisse, Canada et USA, et a des moyennes plus basses pour les catégories de vin RHONE, VDQS, GIRONDE et AOC_AUTRES par rapport à la moyenne globale.
+- **Cluster 2** : Ce cluster comprend les pays: Pays-Bas et la Belgique
+- **Cluster 3** : Ce cluster comprend le pays: RFA et à des moyennes plus élevées pour les catégories de vin ALSACE, AUTRE_VDQS, BOJOLAIS, PROVENCE et MOUSSEAU_SIMPLE par rapport a la moyenne globale.
+- **Cluster 4** : Ce cluster comprend le pays: UK et a des moyennes plus élevées pour les catégories de vin AOC_FORT, MUSCAT et ANJOU par rapport à la moyenne globale.
+
+
+## K-means
+ 
+```{r}
+distance <- get_dist(d)
+fviz_dist(distance, gradient = list(low = "#00AFBB", mid = "white", high = "#FC4E07"))
+```
+
+
+```{r}
+
+# 2. Choix du nombre de clusters (K) - Exemple avec la méthode du coude
+wss <- numeric(7)  # Pour stocker la somme des carrés des distances
+for (i in 1:7) {
+  wss[i] <- sum(kmeans(d, centers = i)$withinss)
+}
+plot(1:7, wss, type = "b", xlab = "Number of Clusters",
+     ylab = "Within groups sum of squares")
+```
+
+
+
+```{r}
+library(metan)
+```
+
+```{r}
+k2 <- kmeans(d, centers = 2, nstart = 25)
+```
+
+
+
+```{r}
+dprime=d
+nom=rownames(d)
+dprime$clust=CAH$data.clust$clust
+dprime$clust=as.factor(dprime$clust)
+dt=rpart(clust~., data=dprime, minsplit=1)
+plot(dt)
+text(dt,pretty=0,cex=0.8)
+dt
+```
+
+
+
+
+```{r}
+res.km <- kmeans(d, 4, nstart = 25, )
+fviz_cluster(res.km, data = d,
+             palette = c("#2E9FDF", "#00AFBB", "#E7B800", "#E1C800"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             ggtheme = theme_bw()
+             )
+```
+
+
+```{r}
+res.km <- kmeans(d, 3, nstart = 25)
+fviz_cluster(res.km, data = d,
+             palette = c("#2E9FDF", "#00AFBB", "#E7B800", "#E1C800"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             ggtheme = theme_bw()
+             )
+```
+
+```{r}
+dprime[,19]=as.integer(dprime[,19])
+
+dprime[,-19]=scale(dprime[,-19])
+
+m1 = lm(clust~., data=dprime) 
+summary(m1)
+
+```
+
+
+```{r}
+choix = regsubsets(clust~., int= T, nbest = 1, nvmax=7, method="exh", data = dprime)
+res = summary(choix)
+print(res)
+#choix du meilleur modèle selon le critère BIC
+plot(choix, scale="bic")
+```
+
+```{r}
+
+m1 = lm(clust~ALSACE+RHON+RHONE+AOC_FORT+AUTRE_FORT+TRES_FORT, data=dprime) # estime le modele linéaire Y  = b0+b1*X+espilon
+summary(m1)
+```
+
+```{r}
+check_collinearity(m1)
+```
+
+```{r}
+m2 <- update(m1, .~.-RHONE)
+check_collinearity(m2)
+```
+
+
+```{r}
+summary(m2)
+```
+
+```{r}
+m2 <- update(m2, .~.-RHON)
+summary(m2)
+```
+
+
+```{r}
+check_model(m2) 
+```
+
+```{r}
+check_normality(m2)
+check_heteroscedasticity(m2)
+
+```
+
+## DBSCAN
+
+DBSCAN est un algorithme de clustering basé sur la densité qui identifie automatiquement les clusters dans les données sans avoir besoin de spécifier le nombre de clusters à l'avance. En utilisant deux paramètres principaux, Eps (epsilon) et MinPts, il peut détecter des clusters de formes arbitraires et est efficace pour gérer les données bruitées.
+
+```{r, echo=FALSE, include =FALSE}
+library(dbscan)
+
+```
+
+
+```{r}
+d_norm<-scale(d)
+
+result1 <- dbscan(d_norm, eps = 4, minPts = 1)
+
+result1
+result1$cluster
+```
+
+
+```{r}
+
+d_norm<-scale(d)
+
+result2 <- dbscan(d_norm, eps = 5, minPts = 1)
+
+result2
+
+result2$cluster
+
+```
+
+
+```{r}
+
+plot_eps4 <- fviz_cluster(result1, data = d,
+                          palette = c("#2E9FDF", "#E1C890", "#E7B800", "#E1C800", "#00AFBB"),
+                          geom = "point",
+                          ellipse.type = "convex",
+                          ggtheme = theme_bw(),
+                          main = "DBSCAN avec eps=4"
+)
+
+# Plot pour eps=4
+plot_eps5 <- fviz_cluster(result2, data = d,
+                          palette = c("#2E9FDF", "#E1C890", "#E7B800", "#E1C800", "#00AFBB"),
+                          geom = "point",
+                          ellipse.type = "convex",
+                          ggtheme = theme_bw(),
+                          main = "DBSCAN avec eps=5"
+)
+
+# Affichage des deux plots
+grid.arrange(plot_eps4, plot_eps5, ncol = 2)
+
+```
+En utilisant les paramètres eps=4 et minPts=1, l'algorithme DBSCAN génère 5 clusters distincts. DBSCAN identifie les clusters en se basant sur la densité des points dans l'espace des données. Avec ces paramètres, nous observons cinq groupes de points qui sont considérés comme densément liés entre eux.
+
+Dans le DBSCAN avec eps=4, on observe dans les clusters:
+
+- **Cluster 1** : Belgique
+- **Cluster 2** : Pays_Bas
+- **Cluster 3** : RFA
+- **Cluster 4** : Italie, Suisse, USA, Canada
+- **Cluster 5** : UK
+
+Comme vu avec la méthode de k-means il peut être intéressant de de regrouper les cluster 1 et 2 avec le 4 ème cluster qui ont des centres assez proches. Cependant ici on regarde les clsuter sur la 1ere et la 2eme dimension cela à aussi surment un impact.  
+
+En utilisant les paramètres eps=4 et minPts=1, l'algorithme DBSCAN génère 3 clusters distincts. DBSCAN identifie les clusters en se basant sur la densité des points dans l'espace des données. Avec ces paramètres, nous observons trois groupes de points qui sont considérés comme densément liés entre eux.
+
+Dans le DBSCAN avec eps=5, on observe dans les clusters:
+
+- **Cluster 1** : Belgique , Pays-Bas, Italie, Canada, Suisse, USA
+- **Cluster 2** : RFA
+- **Cluster 3** : UK
+
+
+
+# IV Interprétation
+
