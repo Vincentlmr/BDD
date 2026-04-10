@@ -1,0 +1,166 @@
+---
+title: "TPBilan"
+author: "Vincent LE MEUR"
+date: "2023-10-24"
+output: 
+html_document: 
+theme: cosmo
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Etude de cas basé sur un tableau individus-variables quantitatives
+
+## Compte rendu
+
+## Partie 1: Analyse en composantes principales normée
+```{r, echo=FALSE,warning=FALSE, include=FALSE}
+library(readr)
+library(knitr)
+library(Hmisc)
+library(corrplot)
+library(FactoMineR)
+library(factoextra)
+
+```
+
+```{r, echo=FALSE,warning=FALSE, include=FALSE}
+
+mydata <- read.delim2("~/IS4/S7/SE/TPBILAN/ClientsBanque.txt")
+
+
+mydata <- as.data.frame(mydata)
+CB <- mydata[-1]
+rownames(CB) <- mydata$Clients
+
+CB <- CB[,-14]
+```
+
+## Analyse des statistiques descriptives
+
+```{r, echo=FALSE,warning=FALSE}
+# Load the knitr package
+
+# Create the table using kable
+
+summary(CB)
+```
+
+```{r, echo = FALSE, comment=""}
+par(mfrow=c(2,4))
+for(i in 2:ncol(CB))
+ {
+ boxplot(CB[,names(CB)[i]], xlab = names(CB)[i], ylab = names(CB)[i],col = "blue")  
+ }
+title("Boites Ã  moustaches", outer=TRUE, line=-1)
+```
+
+
+Grâce à toutes les variables de l'échantillon on remarque que la valeur maximale se trouve dans la variable SOLD et les valeurs minimales se trouvent dans les variables VARR et VADO
+
+On observe une grande différence entre les moyennes des variables, on à pas le même ordre de grandeur entre elle. on ne peut donc pas les comparer. Par conséquent on va utiliser pour ce modèle une ACP normée.
+
+
+## Matrice de corrélation
+
+```{r, echo=FALSE ,warning=FALSE,include=FALSE}
+
+matcor <- cor(CB)
+
+```
+
+```{r, echo=FALSE ,warning=FALSE}
+rcorr <- rcorr(as.matrix(CB))
+
+kable(rcorr$r,caption = "Matrice de correlation")
+
+```
+
+Sur cette table, on peut observer la matrice des corrélations linéaires entre les variables actives de l’analyse.  Cette matrice est carrée et symétrique et ne contient que des 1 sur la diagonale principale. Il s’agit de la corrélation de la variable avec elle-même.
+
+On constate que plusieurs coefficients de corrélation linéaire sont supérieurs à 0,50:
+
+VADO avec SOLD
+DEPO avec SOLD
+MDEC avec NDEC
+MEMP avec NBPR
+RETR avec NBPR
+RETR avec MEMP
+DEPO avec VADO
+
+On pose les hypothèses:
+
+Hypothèse nulle (H0) : Il n'y a pas de corrélation significative entre les deux variables (corrélation = 0).
+
+Hypothèse (H1) : Il existe une corrélation significative entre les deux variables (corrélation ≠ 0).
+
+```{r, echo=FALSE ,warning=FALSE}
+kable(rcorr$P, format = "markdown",caption = "Matrice des p-value")
+
+```
+
+```{r, echo=FALSE ,warning=FALSE}
+
+
+corrplot(matcor, type="upper", order="hclust", tl.col="black", tl.srt=45)
+
+
+```
+
+On peut observer que plusieurs variables sont corrélées positivement avec une p-value inférieur à 0.05 entre elles telles que NMEP et MEMP ou alors VADO et DEPO. 
+
+
+
+## Comment obtenir la matrice de corrélation à partir des fichiers
+
+
+## ACP
+
+```{r, echo=TRUE ,warning=FALSE}
+
+CB.pca = PCA(CB, scale.unit=TRUE,quanti.sup=12:13,graph=FALSE)
+
+```
+
+## Calcul inertir totale:
+
+La formule est: la somme pondéré des carrés des distances des individus au centre de gravité
+
+### Première manière
+
+on fait la somme des valeurs propres:
+
+```{r, echo=TRUE ,warning=FALSE}
+sum(CB.pca$eig[,1])
+
+```
+
+### seconde manière
+ On effectue la somme des variances des variables étudiées
+ 
+ Ou on fait la trace de la matrice de corrélation
+```{r, echo=TRUE ,warning=FALSE}
+sum(diag(matcor))-2
+
+```
+
+## histogramme des valeurs propres
+
+
+
+```{r, echo=FALSE ,warning=FALSE}
+
+fviz_eig(CB.pca,choice = "eigenvalue", addlabels = TRUE )+
+geom_hline (yintercept = 1, linetype = 2, color = "red")
+```
+
+```{r, echo=FALSE ,warning=FALSE}
+
+kable(CB.pca$eig)
+```
+
+
+

@@ -1,0 +1,331 @@
+---
+title: "Statistique Exploratoire Multidimensionnelle"
+author: "Vincent LE MEUR"
+date: "2023-10-06"
+output: 
+html_document: 
+theme: cosmo
+
+---
+
+# Travaux pratiques d’Analyse Factorielle des Correspondances (AFC) sous R à l’aide de données « Contacts-Médias » 
+
+# PARTIE 1
+
+#### On considère dans cette première partie que les modalités de l’âge et du niveau d’étude (Education) sont mises en modalités illustratives (supplémentaires) : c’est-à-dire qu’elles ne sont pas utilisées pour le calcul des valeurs propres mais qu’elles peuvent être utilisées pour l’interprétation des résultats.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE,warning=FALSE}
+library(readr)
+mydata <- read.csv("~/IS4/S7/SE/TP3/Data_Contacts-Média.csv", encoding="latin1", sep=";", comment.char="#")
+ 
+mydata <- as.data.frame(mydata)
+etude <- mydata[-1]
+rownames(etude) <- mydata$IND
+
+```
+
+#### Pour commencer on fait en sorte que le nom des lignes corresponde aux IND:
+
+```{r, echo=FALSE,warning=FALSE}
+
+library(knitr)
+
+kable(head(etude), format = "markdown") 
+
+
+```
+#### Ensuite on affiche le summary:
+```{r, echo=FALSE,warning=FALSE}
+
+
+kable(summary(etude), format = "markdown") 
+
+
+```
+
+## Méthode AFC:
+
+```{r, echo=FALSE,warning=FALSE}
+etude1 <- etude[0:10,]
+```
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE}
+library(FactoMineR)
+library(factoextra)
+
+```
+
+```{r, echo=TRUE,warning=FALSE}
+etude1.ca = CA(etude,row.sup=11:19, ncp=4, graph=FALSE)
+
+```
+### Tableau des valeurs propres :
+```{r, echo=FALSE,warning=FALSE}
+kable(etude1.ca$eig, format = "markdown") 
+```
+
+### Axe à retenir:
+
+```{r, echo=FALSE,warning=FALSE, results="hide"}
+library(plyr)
+
+fviz_eig(etude1.ca, addlabels = TRUE, ylim = c(0, 75))
+```
+
+```{r, echo=FALSE,warning=FALSE, results='hide'}
+sum(etude1.ca$eig[,2]>(100/nrow(etude1.ca$eig)), na.rm=TRUE)
+
+which(etude1.ca$eig[,3]>80)[1]
+##graphiquement
+barplot(etude1.ca$eig[,3])
+lines(c(0,20),c(80,80))
+```
+
+#### On remarque qu'on peut retenir `r which(etude1.ca$eig[,3]>80)[1]` axes factoriels car à partir de cette dimension on observe un pourcentage de variance cumulé des valeurs propres de `r round(etude1.ca$eig[,3]["dim 2"])`%. On l'observe de même avec le phénomène du coude qui est observable sur le premier graphique.
+
+## Interprétation des axes en fonction des médias:
+
+```{r, echo=FALSE,warning=FALSE, results='hide'}
+fviz_ca_col(etude1.ca, repel = TRUE) 
+```
+
+```{r, echo=FALSE,warning=FALSE}
+
+kable(sign(etude1.ca$col$coord), format = "markdown" ,caption = "Tableau des signes")
+
+kable(etude1.ca$col$contrib, format = "markdown",caption = "Tableau des contributions") 
+kable(etude1.ca$col$cos2, format = "markdown",caption = "Tableau des cos²")
+kable(etude1.ca$col$coord, format = "markdown",caption = "Tableau des coordonnées")
+
+```
+#### Axe1:
+##### L'axe 1 est principalement influencé par les variables QuotN et Tél. Cette conclusion est basée sur l'observation du graphique, où l'on peut clairement voir que QuotN et Tél expliquent bien cet axe. Cette tendance se confirme également au niveau du tableau des cos2, où ces deux médias sont les mieux représentés avec des cosinus carrés élevés. De plus, il est important de noter que Tél est en opposition avec le média QuotN, comme l'indique la différence de signes dans le tableau des signes. Cependant, c'est QuotN qui représente le mieux cet axe, avec une contribution notable de 82%. En somme, l'axe 1 est caractérisé par QuotN et Tél, avec une opposition entre ces deux médias, QuotN étant le plus prépondérant.
+
+#### Axe2:
+##### L'axe 2 est influencé par les variables QuotR, Pmag et PMTV. Cette conclusion est également basée sur l'observation du graphique, où l'on peut clairement voir que QuotR, Pmag et PMTV expliquent bien cet axe. Cette tendance se confirme au niveau du tableau des cos2, où ces trois médias sont les mieux représentés. En analysant les contributions, on constate que PMTV joue un rôle prépondérant en contribuant à hauteur de 51%, suivi de QuotR avec 33% et Pmag avec 13%. De plus, PMTV est en opposition avec les médias QuotR et Pmag, comme l'indique la différence de signes dans le tableau des signes. En résumé, l'axe 2 est principalement caractérisé par QuotR, Pmag et PMTV, avec une opposition marquée entre PMTV d'une part, et QuotR et Pmag d'autre part.
+
+#### Synthèse :
+
+##### Sur cet axe 1, les individus vont Enomément regarder le quotidient national et à l'inverse il vont peut être devant leur télévison.
+
+##### Sur le 2 ème axe les individu présent vont  regarder principalement le quotidien régional et la presse mazine et à l'inverse la presse mag.t.v.
+
+## Interprétation des axes en fonction des modalités-lignes:
+
+```{r, echo=FALSE,warning=FALSE, results='hide'}
+fviz_ca_row(etude1.ca,invisible = "row.sup", repel = TRUE)
+
+```
+
+```{r, echo=FALSE,warning=FALSE}
+
+
+kable(sign(etude1.ca$row$coord), format = "markdown" ,caption = "Tableau des signes")
+
+kable(etude1.ca$row$contrib, format = "markdown",caption = "Tableau des contributions") 
+kable(etude1.ca$row$cos2, format = "markdown",caption = "Tableau des cos²")
+kable(etude1.ca$row$coord, format = "markdown",caption = "Tableau des coordonnées")
+
+```
+
+#### Axe1:
+##### L'axe 1 est principalement expliqué par la variable PRCS, qui à elle seule contribue à hauteur de 62% à cet axe. Cette forte contribution est confirmée par un cosinus carré (cos2) de 0,98, ce qui indique que PRCS est très bien représentée sur cet axe. En d'autres termes, PRCS est le facteur prédominant qui influence l'axe 1.
+
+#### Axe2:
+##### L'axe 2 est influencé par trois modalités-lignes principales : AGRI, EMPL et PEPA. Ces trois variables ont des cos2 élevés de 0,8, ce qui signifie qu'elles sont bien représentées sur cet axe. AGRI se démarque en contribuant le plus à cet axe, avec une contribution de 40%. Il est intéressant de noter que AGRI et EMPL sont en opposition sur cet axe, comme le suggère la différence de signes dans le tableau des signes. En résumé, l'axe 2 est principalement caractérisé par AGRI, EMPL et PEPA, avec AGRI jouant un rôle prépondérant et une opposition claire entre AGRI et EMPL.
+
+#### Synthèse: 
+
+##### Sur l'axe 1, on observe que les professions liberals et les cadres supérieurs sont ceux qui regardent le plus les médias influent sur cet axe. Ce sont des personnes avec un bon niveau de revnu.
+
+##### Sur l'axe 2, les agriculteurs, les employés des personnes avec un plus faible revenu sont en opposition avec les petits patrons et proposent une deifférence sur les médias qu'il regardent adin d'influer sur cet axe.
+
+
+
+## Analyse avec des lignes-modalités illustratives:
+
+```{r, echo=FALSE,warning=FALSE}
+
+kable(etude1.ca$row.sup$coord, format = "markdown", caption = "Tableaux des coords des lignes-modalités illustratives")
+
+```
+```{r, echo=FALSE,warning=FALSE}
+
+kable(etude1.ca$row.sup$cos2, format = "markdown", caption = "Tableaux des cos2 des lignes-modalités illustratives")
+
+```
+
+### Analyse:
+
+##### On observe grace aux tableaux que la ligne-modalité illustatrive SUPE représente énormément la dimention une avec un cos2 de 0.94.
+
+##### De même pour la dimension 2 les modalités AGE2 et AGE4 représente très bien cette dimension avec un cos2 de plus de 0.9 et sont suivi de SECO et AGE5  avec respectivement 0.75, 0.7. Deplus on observe que AGE4 et AGE5 sont en opposition avec AGE2 et SECO.
+
+## Projection des modalités-lignes et des médias:
+
+### Sans les illustratives:
+```{r, echo=FALSE,warning=FALSE}
+
+fviz_ca(etude1.ca,invisible = "row.sup", repel=TRUE)
+
+```
+
+#### AXE1:
+
+##### Sur cet axe on interprète que le quotidien national est surtout regardé par des cadres supérieurs et des profession liberal , cependant ces personnes vont beaucoup moins utiliser la télévision.
+
+#### AXE2:
+
+##### Sur cet axe, on obbserve que ce sont les médias du quotidien régional et la presse magazine ,qui sont surtout regardé par des agriculteurs mais aussi par des petits patrons. A l'inverse, ils ne vont pas regarder la presse Mag. T.V. et les employés ne vont pas regader ces médias.
+
+### Avec les illustratives:
+
+```{r, echo=FALSE,warning=FALSE}
+
+fviz_ca(etude1.ca, repel=TRUE)
+
+```
+
+#### AXE1:
+
+##### On peut rajouter à notre annalyse précédente qu'on à plusieurs personnes en étude superieur qui regardent beaucoup le quotidien national.
+
+#### AXE2:
+
+##### On peut rajouter de même à l'analyse précédente, entre 50 et + on tendance à regarder beacoup le quotidien régional ainsi que la presse magazine et à l'inverse peu la presse mag.t.v. Ainsi les personnes de 25 à 34 ans et les personnes danns un des etudes techn et prof ne regarde pas énormément le quotidien régional et la presse magazine.
+
+## Rapport synthèse
+
+#### L'analyse factorielle effectuée sur nos données révèle deux axes factoriels significatifs, expliquant ensemble 89,81% de la variance des valeurs propres, ce qui indique une réduction efficace de la dimensionnalité. Le premier axe est fortement influencé par les médias QuotN et Tél, avec une opposition entre les deux, QuotN ayant la plus grande contribution (82%). Le deuxième axe est caractérisé par les médias QuotR, Pmag et PMTV, avec une nette opposition entre PMTV d'une part et QuotR et Pmag d'autre part, PMTV contribuant le plus (51%).
+
+#### En examinant les modalités-lignes, le premier axe est principalement déterminé par PRCS, tandis que le deuxième axe est influencé par AGRI, EMPL et PEPA, avec une forte opposition entre AGRI et EMPL.
+
+#### En utilisant des lignes-modalités illustratives, nous constatons que SUPE représente fortement la première dimension, tandis qu'AGE2 et AGE4 sont prépondérants dans la deuxième dimension, avec une opposition entre AGE2 et AGE4 d'une part, et AGE5 et SECO d'autre part.
+
+#### Enfin, lors de la projection des modalités-lignes et des médias, nous observons que le Quotidien National est principalement regardé par des cadres supérieurs et des professionnels libéraux, tandis que le Quotidien Régional et la Presse Magazine sont populaires parmi les agriculteurs et les petits patrons. Les résultats sont plus détaillés avec les lignes-modalités illustratives, montrant, par exemple, que les personnes en études supérieures sont de grands consommateurs du Quotidien National, tandis que les personnes de 50 ans et plus sont davantage attirées par le Quotidien Régional et la Presse Magazine, avec des variations significatives en fonction de l'âge et du secteur d'études.
+
+# Partie 2:
+
+##### Maintenant on effectue l’AFC avec toutes les modalités-lignes et tous les médias.
+
+## Méthode AFC:
+
+```{r, echo=TRUE,warning=FALSE}
+etude.ca = CA(etude, ncp=4, graph=FALSE)
+
+```
+
+### Tableau des valeurs propres :
+```{r, echo=FALSE,warning=FALSE}
+kable(etude.ca$eig, format = "markdown") 
+```
+
+### Axe à retenir:
+
+```{r, echo=FALSE,warning=FALSE, results="hide"}
+library(plyr)
+
+fviz_eig(etude.ca, addlabels = TRUE, ylim = c(0, 75))
+```
+
+```{r, echo=FALSE,warning=FALSE, results='hide'}
+sum(etude.ca$eig[,2]>(100/nrow(etude1.ca$eig)), na.rm=TRUE)
+
+which(etude.ca$eig[,3]>80)[1]
+##graphiquement
+barplot(etude.ca$eig[,3])
+lines(c(0,20),c(80,80))
+```
+
+#### On remarque qu'on peut retenir encore `r which(etude1.ca$eig[,3]>80)[1]` axes factoriels car à partir de cette dimension on observe un pourcentage de variance cumulé des valeurs propres de `r round(etude1.ca$eig[,3]["dim 2"])`%. On l'observe de même avec le phénomène du coude qui est observable sur le premier graphique.
+
+## Interprétation des axes en fonction des médias:
+
+```{r, echo=FALSE,warning=FALSE, results='hide'}
+fviz_ca_col(etude.ca, repel = TRUE) 
+```
+
+```{r, echo=FALSE,warning=FALSE}
+
+kable(sign(etude.ca$col$coord), format = "markdown" ,caption = "Tableau des signes")
+
+kable(etude.ca$col$contrib, format = "markdown",caption = "Tableau des contributions") 
+kable(etude.ca$col$cos2, format = "markdown",caption = "Tableau des cos²")
+kable(etude.ca$col$coord, format = "markdown",caption = "Tableau des coordonnées")
+
+```
+#### Axe1:
+##### L'axe 1 est principalement influencé par les variables QuotN, QuotR. Cette conclusion est basée sur l'observation du graphique, où l'on peut clairement voir que QuotN et QuotR expliquent bien cet axe. Cette tendance pour QuotN se confirme également au niveau du tableau des cos2(0.89). De plus, il est important de noter que QuotR est en opposition avec le média QuotN, comme l'indique la différence de signes dans le tableau des signes. Cependant, c'est QuotR qui représente le mieux cet axe, avec une contribution notable de 59%. En somme, l'axe 1 est caractérisé par QuotN et QuotR, avec une opposition entre ces deux médias, QuotN étant le plus prépondérant.
+
+#### Axe2:
+##### L'axe 2 est influencé par les variables QuotN, PMTV. Cette conclusion est également basée sur l'observation du graphique, où l'on peut clairement voir que QuotN et PMTV expliquent bien cet axe. Cette tendance se confirme au niveau du tableau des cos2, où ces s médias sont bien représentés. En analysant les contributions, on constate que QuotN joue un rôle prépondérant en contribuant à hauteur de 59%, suivi de QPMTV avec 16.5%. De plus, PMTV est en opposition avec les médias QuotN, comme l'indique la différence de signes dans le tableau des signes. En résumé, l'axe 2 est principalement caractérisé par QuotN et PMTV, avec une opposition marquée entre PMTV d'une part, et QuotR d'autre part.
+
+#### Synthèse:
+
+##### Sur l'axe 1, La quotidien National est beaucoupo plus regardé que le régional.
+
+##### Sur l'axe 2, ici ce sont les médias de la presse mag.t.v qui est peu regardé comparé au quotidien national.
+
+
+## Interprétation des axes en fonction des modalités-lignes:
+
+```{r, echo=FALSE,warning=FALSE, results='hide'}
+fviz_ca_row(etude.ca,invisible = "row.sup", repel = TRUE)
+
+```
+
+```{r, echo=FALSE,warning=FALSE}
+
+
+kable(sign(etude.ca$row$coord), format = "markdown" ,caption = "Tableau des signes")
+
+kable(etude.ca$row$contrib, format = "markdown",caption = "Tableau des contributions") 
+kable(etude.ca$row$cos2, format = "markdown",caption = "Tableau des cos²")
+kable(etude.ca$row$coord, format = "markdown",caption = "Tableau des coordonnées")
+
+```
+
+#### Axe 1:
+##### L'axe 1 est principalement expliqué par les variables TECP, SUPE, AGE5 et PRIM qui ensemble contribuent à hauteur de 64% à cet axe. Cette forte contribution est confirmée par un cosinus carré (cos²) de 0,96 pour PRIM et 0.8 pour AGE5, ce qui indique que ces deux variables sont bien représentées sur cet axe. On observe de plus que AGE5 et PRIM sont en opposition avec TECP et SUPE.
+
+#### Axe 2:
+##### L'axe 2 est fortement influencé par les variables SUPE, TECP et PRCS ce qui peut être observé sur le graphique ainsi que grâce à leur contribution. Ces trois variables ont des cos² élevés, allant de 0,35 à 0,64, ce qui signifie qu'elles sont bien représentées sur cet axe. Il est également intéressant de noter que la variable TECP a des coordonnées négatives sur cet axe, ce qui est en opposition avec les 2 autres qui ont des coordonnées positives. En résumé, l'axe 2 est principalement caractérisé par TECP, SUPE et PRC.
+
+#### Synthèse: 
+##### Pour l'axe 1, on observe que les individus en école primaire et entre 65 ans et + regardent pas dutout la même chose que les individus étant en études supérieurs et en Techn et prof.
+
+##### Pour l'axe 2, on observe que les individus en étude tech et prof regardent des médias opposés aux indiviuds en études supérieurs et aux individus exercant une profession liberal ou des cadres supérieurs.
+ 
+
+
+## Projection des modalités-lignes et des médias:
+
+
+
+```{r, echo=FALSE,warning=FALSE}
+
+fviz_ca(etude1.ca, repel=TRUE)
+
+```
+
+#### AXE1:
+
+##### Sur cet axe on interprète que le quotidien national est surtout regardé par des cadres supérieurs et des professions liberal et qui ont une éducation Tech et Prof. à l'inverse les personnes de 65 et + ainsi que les primaires ne le regarde pas. De plus  les cadres supérieurs et les professions liberal et qui ont une éducation Tech et Prof ne regardent pas dutout le Quotidien Regionale.
+
+#### AXE2:
+
+##### Sur cet axe, on observe encore que les professions libéral étaient plus intéressé par le quotidien national et à l'inverse les personnes en études supérieurs et en tech prof ne le sont pas. De plus les individus de professions libéral sont plus intéressés par le presse mag.t.v.
+
+## Rapport synthèse
+
+#### Ce texte présente une analyse factorielle de données concernant l'influence des médias et des caractéristiques démographiques sur les préférences médiatiques. Deux axes principaux ont été identifiés, expliquant 92% de la variance cumulée des données.
+
+#### Axe 1 est principalement influencé par QuotN et QuotR, avec une opposition entre les deux médias. Axe 2 est caractérisé par QuotN et PMTV, également en opposition.
+
+#### En ce qui concerne les caractéristiques démographiques, Axe 1 est associé à des individus plus âgés et ayant une éducation primaire, tandis qu'Axe 2 est lié à des professionnels libéraux.
+
+#### En résumé, les cadres supérieurs et les professionnels libéraux ont une préférence marquée pour le Quotidien National, tandis que les personnes plus âgées et moins éduquées privilégient le Quotidien Régional. Les professionnels libéraux sont également plus enclins à suivre la presse magazine télévisée.

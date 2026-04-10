@@ -1,0 +1,192 @@
+---
+title: "Corrélation linéaire et Régression Linéaire Multiple à l’aide de R"
+author: "Vincent LE MEUR"
+date: "2023-09-07"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# TP1 : Corrélation linéaire et Régression Linéaire Multiple à l’aide de R
+
+## Compte rendu
+
+## Importation des données dans R :# Etape Date
+
+
+### 1
+
+### b
+```{r , echoe=TRUE ,warning=FALSE}
+library(readxl)
+TP1exel <- read_excel("TP1exel.xlsx")
+View(TP1exel)
+```
+
+
+### c
+```{r , echoe=TRUE ,warning=FALSE}
+head(TP1exel)
+```
+
+### d
+```{r , echoe=TRUE ,warning=FALSE}
+summary(TP1exel)
+```
+
+### e
+```{r, echo = FALSE, comment=""}
+par(mfrow=c(2,4))
+for(i in 2:ncol(TP1exel))
+ {
+ boxplot(TP1exel[,names(TP1exel)[i]], xlab = names(TP1exel)[i], ylab = names(TP1exel)[i], col = ifelse(i==8, "red","blue"))  
+ }
+title("Boites Ã  moustaches", outer=TRUE, line=-1)
+```
+
+### Calcul de la Matrice des Corrélations linéaires et analyse
+
+### 2
+
+```{r, echo = FALSE, comment=""}
+TP1exelnew <- TP1exel[,-1]
+matcor <- cor(TP1exelnew)
+```
+
+```{r, echo = FALSE, comment=""}
+library(Hmisc)
+
+rcorr(as.matrix(TP1exelnew))
+```
+On voit que certaines corrélations sont proches de 1 (par exemple, entre A21 et A24), ce qui indique une forte corrélation positive, tandis que d'autres sont proches de 0 (par exemple, entre A15 et A18), ce qui indique une corrélation faible.
+
+### 3
+
+On pose : 
+H0 (hypothèse nulle) : Il n'y a pas de corrélation significative entre les valeurs.
+H1 (hypothèse alternative) : Il y a une corrélation significative entre les valeurs.
+
+```{r, echo = FALSE, comment=""}
+library(corrplot)
+corrplot(matcor, type="upper", order="hclust", tl.col="black", tl.srt=45)
+
+```
+Avec rcorr on observe en général que plusieurs paires de variables présentent des corrélations significatives, ce qui suggère des relations linéaires entre elles par exemple A18 et A21.
+Les corrélations positives et négatives sont présentes, ce qui signifie que certaines variables évoluent ensemble, tandis que d'autres évoluent dans des directions opposées.
+La corrélation entre TR et A12 est particulièrement forte (0.96) et significative, ce qui indique une relation étroite entre ces deux variables. Que l'on peut aussi vérifier avec corrplot on le cercle est foncé entre ces valeurs.
+
+### Régression linéaire multiple avec R : Rédaction et analyse des résultats
+
+### 4
+
+```{r, echo = FALSE, comment=""}
+
+m1 <- lm(TR~. , data=TP1exelnew)
+
+summary(m1)
+
+```
+### 5
+
+On pose: 
+H0 (Hypothèse Nulle) : Tous les coefficients de régression sont égaux à zéro, ce qui signifie que le modèle n'explique pas la variance de la variable dépendante (TR), le modèle n'est donc pas significativement différent d'un modèle sans variables indépendantes.
+
+H1 (Hypothèse Alternative) : Au moins un des coefficients de régression est différent de zéro, ce qui indique que le modèle explique une part significative de la variance de la variable dépendante (TR).
+
+Comme la p-value est < 0.05, alors on peut rejeter l'hypothèse nulle (H0) et conclure que le modèle de régression est globalement significatif.
+
+### 6
+
+En utilisant les sept longueurs d'onde (A09, A12, A15, A18, A21, A24, A27) comme variables indépendantes, le modèle de régression linéaire multiple explique environ 98,18 % de la variation observée dans la variable TR. Cela indique que le modèle est relativement efficace pour prédire les valeurs de TR en fonction de ces longueurs d'onde.
+
+
+### 7
+
+- Coefficient pour A09 : Le coefficient pour A09 est estimé à -16.2561. Cela signifie que pour une unité d'augmentation dans A09, la valeur de TR diminue en moyenne de 16.2561 unités.
+
+- Coefficient pour A12 : Le coefficient pour A12 est estimé à 35.1935. Cela signifie que pour une unité d'augmentation dans A12, la valeur de TR augmente en moyenne de 35.1935 unités.
+
+- Coefficient pour A15 : Le coefficient pour A12 est estimé à 17.0438. Cela signifie que pour une unité d'augmentation dans A15, la valeur de TR augmente en moyenne de 17.0438 unités. 
+
+- Coefficient pour A18 : Le coefficient pour A12 est estimé à -0,4485. Cela signifie que pour une unité d'augmentation dans A18, la valeur de TR diminue en moyenne de 0.4485 unités. 
+
+- Coefficient pour A21 : Le coefficient pour A12 est estimé à -4,6430. Cela signifie que pour une unité d'augmentation dans A21, la valeur de TR diminue en moyenne de 4.6430 unités. 
+
+- Coefficient pour A24 : Le coefficient pour A12 est estimé à 1.7982. Cela signifie que pour une unité d'augmentation dans A24, la valeur de TR augmente en moyenne de 1.7982 unités. 
+
+- Coefficient pour A27 : Le coefficient pour A12 est estimé à -13.6170. Cela signifie que pour une unité d'augmentation dans A27, units valeur de TR diminue en moyenne de 13.6170 unités. 
+
+### 8
+
+```{r, echo = FALSE, comment=""}
+
+# Extraire les coefficients du modèle
+coefficients <- coef(m1)
+
+# Extraire les erreurs standards des coefficients
+std_errors <- summary(m1)$coefficients[, "Std. Error"]
+
+# Calculer les statistiques de test t et les valeurs de p pour chaque coefficient
+t_statistics <- coefficients / std_errors
+p_values <- 2 * pt(-abs(t_statistics), df = length(TP1exel$TR) - length(coefficients))
+
+# Créer un tableau récapitulatif des résultats
+results <- data.frame(
+  Variable = names(coefficients),
+  Coefficient = coefficients,
+  Standard_Error = std_errors,
+  t_Statistic = t_statistics,
+  p_Value = p_values
+)
+
+# Afficher les résultats
+results
+
+
+```
+
+on observe: 
+Si la valeur de p associée à un coefficient est inférieure à 0.05 comme A12, cela indique que la longueur d'onde correspondante a une contribution marginale significative au modèle.
+
+Si la valeur de p est supérieure à 0.05 comme A24, cela suggère que la longueur d'onde n'a pas de contribution marginale significative au modèle.
+
+### 9
+
+```{r, echo = FALSE, comment=""}
+
+# Obtenir les valeurs prédites de TR à partir du modèle
+predicted_TR <- predict(m1, TP1exel)
+
+# Calculer les résidus (erreurs aléatoires)
+residuals <- TP1exel$TR - predicted_TR
+
+# Créer un tableau des valeurs prévisionnelles et des résidus
+prediction_table <- data.frame(
+  Observé = TP1exel$TR,
+  Prévision = predicted_TR,
+  Résidus = residuals
+)
+
+# Afficher le tableau
+print(prediction_table)
+
+
+```
+
+### 10
+
+```{r, echo = FALSE, comment=""}
+shapiro_test <- shapiro.test(residuals)
+
+shapiro_test
+
+qqnorm(residuals)
+qqline(residuals, col = 2)
+```
+
+La valeur de p est supérieure au niveau de signification choisi (0.05), alors on ne peut pas rejeter l'hypothèse nulle, ce qui suggère que les résidus suivent approximativement une distribution normale, que l'on peut observer sur le QQplot.

@@ -1,0 +1,10 @@
+TP1:
+
+Exo 1:
+    Q1) Il indique qui écrit si c'est le père ou le fils en fonction de cr qui représente le processus du père ou du fils.
+    Q2) Les PID et PPID sont: 4818/3203 et 4819/4818  le père est celui dont le PID est 4818
+    
+Exo2:
+    Dans ce programme on à 2 processus qui représentent le père et le fils gâce au fork. Dans ces processus la variable ent n'est pas relié donc quand le cr est supérieur à 0 on se trouve dans le processus du père et on va avoir la valeur de ent avant et après l'incrémentation qui sera de 0 puis de 2. Et le processus fera de m^me quand le cr sera de 0 et coprrespondra au fils.
+    
+Exo3:

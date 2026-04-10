@@ -1,0 +1,9 @@
+BEGIN:VCARD
+FN:Assi Lazare N'GUESSAN PhD - HDR
+N:N'GUESSAN ;Assi Lazare;;;
+ORG:Université de Lille;Polytech Lille - Bureau F125
+ADR:;;+33(0)328767457;Villeneuve d'Ascq;;59650;France
+TITLE:Enseignant -Chercheur
+TEL;TYPE=work:+33328767457
+EMAIL;PREF=1;TYPE=work:assi.nguessan@polytech-lille.fr
+END:VCARD

@@ -1,0 +1,19 @@
+---
+title: "tp3"
+author: "Vincent LE MEUR"
+date: "2023-12-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,warning=FALSE}
+load("~/IS4/S7/CS/TP3/prema.RData")
+
+str(prema)
+prema$DIAB = as.factor(prema$DIAB)
+attach(prema)
+
+```

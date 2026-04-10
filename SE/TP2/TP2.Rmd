@@ -1,0 +1,195 @@
+---
+title: 'TP2:  Analyse Factorielle des Correspondances : AFC: avec R ou Rstudio'
+author: "Vincent LE MEUR"
+date: "2023-09-26"
+output: 
+html_document: 
+theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, echo=FALSE,warning=FALSE}
+library(readxl)
+mydata<- read_excel("data-look-virgule.xls")
+
+mydata <- as.data.frame(mydata)
+fumeurs <- mydata[-1]
+rownames(fumeurs) <- mydata$libellé
+
+# Load the knitr package
+library(knitr)
+
+# Create the table using kable
+kable(summary(fumeurs), format = "markdown") 
+
+```
+
+## Méthode AFC
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE}
+library(FactoMineR)
+library(factoextra)
+
+```
+
+```{r, echo=TRUE,warning=FALSE}
+fumeurs.ca = CA(fumeurs, ncp=4, graph=FALSE)
+```
+
+## Axe à retenir
+
+```{r, echo=FALSE,warning=FALSE, results="hide"}
+library(plyr)
+
+fumeurs.ca$eig
+fviz_eig(fumeurs.ca, addlabels = TRUE, ylim = c(0, 50))
+```
+
+```{r, echo=FALSE,warning=FALSE}
+# Load the knitr package
+library(knitr)
+
+# Create the table using kable
+kable(fumeurs.ca$eig, format = "markdown") 
+
+```
+
+Grâce au graphique on peut observer que le phénomène du coude arrive au niveau de la 6ème dimension. cependant Avec le tableau on décide de prendre seulement les 4 premières dimensions car les 80% sont atteint à cette dimension.
+
+```{r, echo=FALSE,warning=FALSE, results='hide'}
+sum(fumeurs.ca$eig[,2]>(100/nrow(fumeurs.ca$eig)), na.rm=TRUE)
+
+### graphiquement
+
+fviz_screeplot (fumeurs.ca) +
+ geom_hline (yintercept = 100/nrow(fumeurs.ca$eig), linetype = 2, color = "red")
+
+which(fumeurs.ca$eig[,3]>80)[1]
+##graphiquement
+barplot(fumeurs.ca$eig[,3])
+lines(c(0,20),c(80,80))
+```
+
+
+## Interprétation des axes en fonction des marques
+
+```{r, echo=FALSE,warning=FALSE, results='hide'}
+fumeurs.ca$col$contrib
+fumeurs.ca$col$cos2
+fumeurs.ca$col$coord
+sign(fumeurs.ca$col$coord)
+fviz_ca_col(fumeurs.ca, repel = TRUE) 
+```
+
+```{r, echo=FALSE,warning=FALSE, results='hide'}
+
+# Load the knitr package
+library(knitr)
+
+# Create the table using kable
+kable(fumeurs.ca$col$contrib, format = "markdown",caption = "Tableau des contributions") 
+kable(fumeurs.ca$col$cos2, format = "markdown",caption = "Tableau des cos²")
+kable(fumeurs.ca$col$coord, format = "markdown",caption = "Tableau des coordonnées")
+
+```
+
+## Interprétation des axes en fonction des attributs
+
+
+```{r, echo=FALSE,warning=FALSE, results='hide'}
+fumeurs.ca$row$contrib
+fumeurs.ca$row$cos2
+fumeurs.ca$row$coord
+sign(fumeurs.ca$row$coord)
+fviz_ca_row(fumeurs.ca, repel = TRUE)
+plot(fumeurs.ca)
+CA(fumeurs, ncp=2, graph=TRUE)
+```
+
+```{r, echo=FALSE,warning=FALSE, results='hide'}
+# Load the knitr package
+library(knitr)
+
+# Create the table using kable
+kable(fumeurs.ca$row$contrib, format = "markdown",caption = "Tableau des contributions") 
+kable(fumeurs.ca$row$cos2, format = "markdown",caption = "Tableau des cos²")
+kable(fumeurs.ca$row$coord, format = "markdown",caption = "Tableau des coordonnées")
+
+```
+
+
+## Projection des marques et attributs dans le premier plan 
+
+```{r, echo=FALSE,warning=FALSE}
+fumeurs.ca = CA(fumeurs, ncp=4, graph=F, col.sup=3, row.sup=c(7,8))
+
+```
+
+
+```{r, echo=FALSE,warning=FALSE}
+fumeurs.ca$eig
+fviz_eig(fumeurs.ca, addlabels = TRUE, ylim = c(0, 50))
+```
+
+```{r, echo=FALSE,warning=FALSE}
+## inertie moyenne
+
+
+## les commandes sont équivalents
+sum(fumeurs.ca$eig[,2]>(100/nrow(fumeurs.ca$eig)), na.rm=TRUE)
+
+### graphiquement
+barplot(fumeurs.ca$eig[,1])
+lines(c(0,10),c(sum(fumeurs.ca$eig[,1])/nrow(fumeurs.ca$eig),sum(fumeurs.ca$eig[,1])/nrow(fumeurs.ca$eig)))
+```
+
+
+```{r, echo=FALSE,warning=FALSE}
+## inertie totale,
+# code
+which(fumeurs.ca$eig[,3]>80)[1]
+##graphiquement
+barplot(fumeurs.ca$eig[,3])
+lines(c(0,10),c(80,80))
+```
+
+```{r, echo=FALSE,warning=FALSE, results='hide'}
+fumeurs.ca$col$contrib
+fumeurs.ca$col$cos2
+fumeurs.ca$col$coord
+sign(fumeurs.ca$col$coord)
+```
+
+```{r, echo=FALSE,warning=FALSE}
+
+kable(fumeurs.ca$col$contrib, format = "markdown",caption = "Tableau des contributions")
+kable(fumeurs.ca$col$cos2, format = "markdown",caption = "Tableau des cos2")
+kable(fumeurs.ca$col$coord, format = "markdown",caption = "Tableau des coordonnées")
+
+
+```
+
+```{r, echo=FALSE,warning=FALSE, results='hide'}
+fumeurs.ca$row$contrib
+fumeurs.ca$row$cos2
+fumeurs.ca$row$coord
+sign(fumeurs.ca$row$coord)
+```
+
+```{r, echo=FALSE,warning=FALSE}
+
+kable(fumeurs.ca$row$contrib, format = "markdown",caption = "Tableau des contributions")
+kable(fumeurs.ca$row$cos2, format = "markdown",caption = "Tableau des cos2")
+kable(fumeurs.ca$row$coord, format = "markdown",caption = "Tableau des coordonnées")
+
+
+```
+
+```{r, echo=FALSE,warning=FALSE}
+
+CA(fumeurs, ncp=4, graph=T, col.sup=3, row.sup=c(7,8))
+```

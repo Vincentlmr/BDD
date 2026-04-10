@@ -1,0 +1,19 @@
+Étudiant(e) : VINCENT LE MEUR
+CC1 = 16.0 
+CC2 = 10.0
+CC3 = 16.0
+CC4 = 10.0
+CC5 = 8.0
+CC  = 13.5
+
+CC = la moyenne pondérée des 4 meilleures notes : les trois plus fortes 
+     sont comptées avec coefficient 1, la quatrième avec un coefficient 1/3
+
+Commentaires sur le TP1 :
+-----------------------
+Partie moindres carrés : l’affichage des deux courbes bien fait.
+La suite est très bien aussi.
+
+Commentaires sur le TP2 :
+-----------------------
+C’est bien mais bug dans la question 5

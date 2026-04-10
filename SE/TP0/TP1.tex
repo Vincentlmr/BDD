@@ -1,0 +1,247 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Untitled},
+  pdfauthor={Vincent LE MEUR},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Untitled}
+\author{Vincent LE MEUR}
+\date{2023-09-07}
+
+\begin{document}
+\maketitle
+
+\hypertarget{tp1-corruxe9lation-linuxe9aire-et-ruxe9gression-linuxe9aire-multiple-uxe0-laide-de-r}{%
+\section{TP1 : Corrélation linéaire et Régression Linéaire Multiple à
+l'aide de
+R}\label{tp1-corruxe9lation-linuxe9aire-et-ruxe9gression-linuxe9aire-multiple-uxe0-laide-de-r}}
+
+\hypertarget{compte-rendu}{%
+\subsection{Compte rendu}\label{compte-rendu}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(readxl)}
+\NormalTok{TP1exel }\OtherTok{\textless{}{-}} \FunctionTok{read\_excel}\NormalTok{(}\StringTok{"TP1exel.xlsx"}\NormalTok{)}
+\FunctionTok{View}\NormalTok{(TP1exel)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{etape-date}{%
+\subsubsection{1 Etape Date}\label{etape-date}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(TP1exel)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 9
+##   SOL      TR   A09   A12   A15   A18   A21   A24   A27
+##   <chr> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+## 1 SL01      2 0.632 0.292 0.318 0.436 0.296 0.069 0.079
+## 2 SL02      4 0.552 0.275 0.418 0.468 0.258 0.116 0.072
+## 3 SL03      6 0.565 0.3   0.392 0.501 0.279 0.04  0.052
+## 4 SL04      8 0.549 0.332 0.502 0.509 0.224 0.055 0.018
+## 5 SL05     10 0.57  0.351 0.449 0.48  0.222 0.056 0.025
+## 6 SL06     12 0.273 0.309 0.427 0.324 0.156 0.056 0.08
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(TP1exel)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      SOL                  TR             A09              A12        
+##  Length:16          Min.   : 2.00   Min.   :0.2540   Min.   :0.2750  
+##  Class :character   1st Qu.: 9.50   1st Qu.:0.4677   1st Qu.:0.3202  
+##  Mode  :character   Median :15.00   Median :0.5265   Median :0.4110  
+##                     Mean   :15.38   Mean   :0.5098   Mean   :0.4689  
+##                     3rd Qu.:22.50   3rd Qu.:0.5663   3rd Qu.:0.5835  
+##                     Max.   :28.00   Max.   :0.7540   Max.   :0.7930  
+##       A15              A18              A21              A24         
+##  Min.   :0.3180   Min.   :0.2650   Min.   :0.0630   Min.   :0.01900  
+##  1st Qu.:0.4195   1st Qu.:0.4510   1st Qu.:0.1482   1st Qu.:0.04975  
+##  Median :0.5260   Median :0.5050   Median :0.1765   Median :0.05950  
+##  Mean   :0.5638   Mean   :0.4956   Mean   :0.1949   Mean   :0.06463  
+##  3rd Qu.:0.6730   3rd Qu.:0.5218   3rd Qu.:0.2587   3rd Qu.:0.07975  
+##  Max.   :0.9390   Max.   :0.7850   Max.   :0.3130   Max.   :0.11600  
+##       A27         
+##  Min.   :0.00600  
+##  1st Qu.:0.03475  
+##  Median :0.07200  
+##  Mean   :0.06031  
+##  3rd Qu.:0.08075  
+##  Max.   :0.10000
+\end{verbatim}
+
+\includegraphics{TP1_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\hypertarget{calcul-de-la-matrice-des-corruxe9lations-linuxe9aires-et-analyse}{%
+\subsubsection{Calcul de la Matrice des Corrélations linéaires et
+analyse}\label{calcul-de-la-matrice-des-corruxe9lations-linuxe9aires-et-analyse}}
+
+\begin{verbatim}
+Le chargement a nécessité le package : lattice
+\end{verbatim}
+
+\begin{verbatim}
+Le chargement a nécessité le package : survival
+\end{verbatim}
+
+\begin{verbatim}
+Le chargement a nécessité le package : Formula
+\end{verbatim}
+
+\begin{verbatim}
+Le chargement a nécessité le package : ggplot2
+\end{verbatim}
+
+\begin{verbatim}
+
+Attachement du package : 'Hmisc'
+\end{verbatim}
+
+\begin{verbatim}
+Les objets suivants sont masqués depuis 'package:base':
+
+    format.pval, units
+\end{verbatim}
+
+\begin{verbatim}
+       TR  A09  A12  A15  A18   A21  A24  A27
+TR   1.00 0.23 0.96 0.92 0.59 -0.23 0.02 0.40
+A09  0.23 1.00 0.48 0.56 0.88  0.83 0.25 0.37
+A12  0.96 0.48 1.00 0.97 0.76  0.02 0.08 0.51
+A15  0.92 0.56 0.97 1.00 0.83  0.13 0.11 0.47
+A18  0.59 0.88 0.76 0.83 1.00  0.61 0.22 0.46
+A21 -0.23 0.83 0.02 0.13 0.61  1.00 0.21 0.27
+A24  0.02 0.25 0.08 0.11 0.22  0.21 1.00 0.30
+A27  0.40 0.37 0.51 0.47 0.46  0.27 0.30 1.00
+
+n= 16 
+
+
+P
+    TR     A09    A12    A15    A18    A21    A24    A27   
+TR         0.3946 0.0000 0.0000 0.0164 0.3967 0.9556 0.1285
+A09 0.3946        0.0617 0.0251 0.0000 0.0000 0.3598 0.1527
+A12 0.0000 0.0617        0.0000 0.0006 0.9424 0.7605 0.0437
+A15 0.0000 0.0251 0.0000        0.0000 0.6187 0.6916 0.0636
+A18 0.0164 0.0000 0.0006 0.0000        0.0113 0.4129 0.0760
+A21 0.3967 0.0000 0.9424 0.6187 0.0113        0.4409 0.3097
+A24 0.9556 0.3598 0.7605 0.6916 0.4129 0.4409        0.2616
+A27 0.1285 0.1527 0.0437 0.0636 0.0760 0.3097 0.2616       
+\end{verbatim}
+
+\begin{verbatim}
+corrplot 0.92 loaded
+\end{verbatim}
+
+\includegraphics{TP1_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+On regarde les correlations dont la p valeur est différente de 0
+
+\end{document}
