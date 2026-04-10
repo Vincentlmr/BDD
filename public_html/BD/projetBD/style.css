@@ -1,0 +1,58 @@
+table
+{
+    width           : 30%;
+    margin          : auto;
+    border          : 0px solid;
+    border-collapse     : collapse;
+    border-radius: 1em;
+    overflow: hidden;  
+}
+
+th, td {
+  padding: 10px;
+  background: #ddd;
+  border-bottom: 1px solid black; 
+}
+
+    
+    
+
+
+.card-layout {
+    display: flex;
+
+    /* Put a card in the next row when previous cards take all width */
+    flex-wrap: wrap;
+
+    margin-left: -0.25rem;
+    margin-right: -0.25rem;
+}
+
+.card-layout__item {
+    /* There will be 3 cards per row */
+    flex-basis: 33.33333%;
+
+    padding-left: 100px;
+    padding-right: 100px;
+    border-width:1px;
+	border-style:solid;
+	border-color:black;
+	border-radius: 10px;
+}
+
+.sticky-sections {
+    height: 100%;
+    overflow: scroll;
+}
+
+.sticky-sections__section {
+    /* Take full size */
+    height: 100%;
+    width: 100%;
+
+    /* Stick to the top */
+    position: sticky;
+    top: 0;
+}
+
+

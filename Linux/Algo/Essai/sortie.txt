@@ -1,0 +1,4 @@
+Veuillez saisir un entier : Veuillez saisir un entier : Veuillez saisir un entier : Veuillez saisir un entier : Veuillez saisir un entier : 
+
+La moyenne des entiers saisies est : 5.50
+
