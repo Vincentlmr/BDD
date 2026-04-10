@@ -1,0 +1,249 @@
+---
+title: "Statistique inférentielle"
+author: "Vincent Le Meur"
+date: '2023'
+output:
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE ,warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# TP2 : Intervalles de confiance
+
+## Compte rendu
+
+### Question 1
+
+Calculer la moyenne (empirique) et la variance (empirique) du poids à la naissance pour l'ensemble des nouveau-nés.
+
+Dans un premier temps on importe le dossier poids.csv
+
+```{r , echoe=TRUE ,warning=FALSE}
+library(readr)
+poids <- read_csv("poids.csv", col_names = FALSE)
+View(poids)
+```
+
+On rappelle les formules de la moyenne empirique et de la variance empirique:
+
+Moyenne empirique: $$(\frac{1}{n}) \sum(log(X))$$
+
+Variance empirique: $$(\frac{1}{(n-1)}*\sum((log(X)-moy-emp)^2))$$
+
+```{r , echoe=TRUE ,warning=FALSE}
+n=length(poids$X1)
+
+
+moy_emp= (1/n)*sum(poids$X1)
+var_emp= (1/n-1)*sum(((poids$X1)-mean(poids$X1))^2)
+
+library(knitr)
+
+# Créer le tableau
+tableau <- data.frame(
+  Donné = c("Moyenne empirique", "Variance empirique"),
+  Valeur = c(moy_emp, var_emp)
+)
+
+# Afficher le tableau avec kable
+kable(tableau)
+
+
+```
+
+### Question 2
+
+Écrire une fonction qui, à partir d'un vecteur de données et d'un entier n, renvoie une liste contenant un échantillon aléatoire de taille n provenant des données fournies, ainsi que la moyenne empirique et la variance empirique de cet échantillon. Estimer à l'aide de cette fonction la moyenne et la variance du poids à la naissance à partir des échantillons de taille n = 30, 60 et 80.
+
+```{r , echoe=TRUE ,warning=FALSE}
+analyse <- function(X,n){
+  echantillon <- sample(X,n)
+  moy_emp= (1/n)*sum(echantillon)
+  var_emp= (1/n-1)*sum(((echantillon)-mean(echantillon))^2)
+  
+  return(list(echantillon=echantillon,moy_emp=moy_emp,var_emp=var_emp))
+}
+
+```
+
+On Estime maintenant avec différentes tailles d'échantillons:
+
+Pour une taille d'échantillons de 30:
+
+```{r , echoe=TRUE ,warning=FALSE}
+ech30=analyse(poids$X1,30)
+ech30
+
+
+
+
+```
+Pour une taille d'échantillons de 60:
+
+```{r , echoe=TRUE ,warning=FALSE}
+
+ech60=analyse(poids$X1,60)
+ech60
+
+
+
+```
+
+Pour une taille d'échantillons de 80:
+
+```{r , echoe=TRUE ,warning=FALSE}
+
+ech80=analyse(poids$X1,80)
+ech80
+
+
+```
+### Question 3
+
+Écrire une fonction qui, à partir d'un vecteur de données normales, calcule un intervalle de confiance de niveau de risque pour la moyenne en supposant la variance connue. Calculer les intervalles de confiance à 95% pour le poids moyen à la naissance à partir des échantillons obtenus à la question.
+
+on prend $\sigma^2=438,9^2$
+
+```{r , echoe=TRUE ,warning=FALSE}
+interv_conf <- function(X,sigma,risque){
+  n=length(X)
+  moy_emp= (1/n)*sum(X)
+  q<-qnorm(1-risque/2)
+  
+  return(list(moy_emp-((sigma)/sqrt(n))*q,moy_emp+((sigma)/sqrt(n))*q))
+}
+
+```
+
+Calculon l'interval de confiance à 95%
+
+```{r , echoe=TRUE ,warning=FALSE}
+sigma=(438.9)
+
+ic_30=interv_conf(ech30$echantillon,sigma,0.05)
+ic_60=interv_conf(ech60$echantillon,sigma,0.05)
+ic_80=interv_conf(ech80$echantillon,sigma,0.05)
+
+
+library(knitr)
+
+# Définir les tailles d'échantillons
+tailles_echantillons <- c(30, 60, 80)
+
+
+intervalle_confiance <- list(c(ic_30[1], ic_30[2]), c(ic_60[1], ic_60[2]), c(ic_80[1], ic_80[2]))
+
+# Créer le tableau
+tableau <- data.frame(Taille = tailles_echantillons, `Intervalle de confiance` = sapply(intervalle_confiance, function(x) paste0("[", x[1], ", ", x[2], "]")))
+
+# Afficher le tableau avec kable
+kable(tableau)
+
+
+```
+
+### Question 4
+
+Écrire une fonction qui, à partir d'un vecteur de données normales, calcule un intervalle de confiance de niveau de risque pour la moyenne en supposant la variance inconnue. Calculer les intervalles de confiance à 95% pour le poids moyen à la naissance à partir des échantillons obtenus à la question 2. Comparer les résultats avec ceux de la fonction t.test.
+
+```{r , echoe=TRUE ,warning=FALSE}
+interv_conf2<-function(X,risque){
+  n=length(ech30$echantillon)
+  moy_emp= (1/n)*sum(ech30$echantillon)
+ 
+  var_emp= (1/(n-1))*sum(((ech30$echantillon)-moy_emp)^2)
+ 
+
+  s<-sqrt(var_emp)/sqrt(n)
+  quart <- qt(1-risque/2,n-1)
+  return(list(moy_emp-(s)*quart,moy_emp+(s)*quart))
+}
+```
+
+Calculon l'interval de confiance à 95% et Comparons avec t.test
+
+```{r , echoe=TRUE ,warning=FALSE}
+
+ic2_30=interv_conf2(ech30$echantillon,0.05)
+ic3_30=t.test(ech30$echantillon)
+
+ic2_60=interv_conf2(ech60$echantillon,0.05)
+ic3_60=t.test(ech60$echantillon)
+
+ic2_80=interv_conf2(ech80$echantillon,0.05)
+ic3_80=t.test(ech80$echantillon)
+
+
+
+tableau <- matrix(c(paste("[", ic2_30[1], ",", ic2_30[2], "]", sep = " "),
+                    paste("[", ic3_30[4]$conf.int[1],",",ic3_30[4]$conf.int[2], "]", collapse = " "),
+                    paste("[", ic2_60[1], ",", ic2_60[2], "]", sep = " "),
+                    paste("[", ic3_60[4]$conf.int[1],",",ic3_60[4]$conf.int[2], "]", collapse = " "),
+                    paste("[", ic2_80[1], ",", ic2_80[2], "]", sep = " "),
+                    paste("[", ic3_80[4]$conf.int[1],",",ic3_80[4]$conf.int[2], "]", collapse = " ")
+                    ), 
+                  ncol = 2, byrow = TRUE)
+
+
+colnames(tableau) <- c("Fonction TP", "t.test")
+rownames(tableau) <- c("1", "2", "3")
+
+library(knitr)
+kable(tableau, caption = "Comparaison avec t.test")
+
+
+
+
+
+```
+
+On trouve les mêmes intervalles de confiance calculés avec notre fonction et avec la fonction t.test
+
+### Question 5
+
+Déterminer un intervalle de confiance à 95% pour la proportion de cartons de lait défectueux en utilisant les formules vues en cours et en utilisant la fonction binom.test de R. 
+
+On calcul la la proportion de carton de lait défectueux avec les formules vues en cours
+
+Les formules sont: $$\Bigg[\ \bar{X_n} - u_{1-\frac\alpha 2} \sqrt{ \frac{\bar{X_n}(1-\bar{X_n})}{n}}\ ,\ \bar{X_n} + u_{1-\frac\alpha 2} \sqrt{ \frac{\bar{X_n}(1-\bar{X_n})}{n}}\ \Bigg]$$
+
+```{r , echoe=TRUE ,warning=FALSE}
+prop=20/197
+r=0.05
+
+prop_inf= prop- (qnorm(1-(r/2),mean=0,sd=1)*sqrt(prop*(1-prop)/197))
+
+prop_sup=prop + (qnorm(1-(r/2),mean=0,sd=1)*sqrt(prop*(1-prop)/197))
+```
+
+On calcul la la proportion de carton de lait défectueux avec la fonction binom.test
+
+```{r , echoe=TRUE ,warning=FALSE}
+interv_conf<-binom.test(c(20,197),n=197,conf.level = 1-r)
+
+```
+```{r , echoe=TRUE ,warning=FALSE}
+
+dif1=abs((prop_inf-interv_conf[4]$conf.int[1])/interv_conf[4]$conf.int[1])*100
+dif2=abs((prop_sup-interv_conf[4]$conf.int[2])/interv_conf[4]$conf.int[2])*100
+
+library(knitr)
+
+
+# Créer le tableau
+tableau <- data.frame(
+  `Interval formules du cours` = paste("[", prop_inf, ",", prop_sup, "]", sep = ""),
+  `Interval binom.test` = paste("[", interv_conf[4]$conf.int[1], ",", interv_conf[4]$conf.int[2], "]", sep = ""),
+  `Ecart inférieur` = dif1,
+  `Ecart supérieur` = dif2
+)
+
+# Afficher le tableau avec kable
+kable(tableau)
+
+
+```
+On remarque des écart de 3.5% et 3.7% ce qui est acceptable mais quand même présent.

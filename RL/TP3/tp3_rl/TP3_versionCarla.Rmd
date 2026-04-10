@@ -1,0 +1,226 @@
+---
+title: "TP3"
+author: "Carla BUONOMO & Clara BALDACCHINO"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+
+cornell <- read.csv("/home/c/b/cbaldacc/Linux/RL/TP3/cornell.csv", sep=",", dec=".")
+
+```
+
+# Question 1
+
+## Statistiques univariées 
+
+```{r}
+
+stat_uni = function(x)
+{
+return(c(length(na.omit(x)),
+         length(x[is.na(x)]), 
+         min(x, na.rm=TRUE), 
+         max(x, na.rm=TRUE), 
+         mean(x, na.rm=TRUE), 
+         median(x, na.rm=TRUE), 
+         sd(x, na.rm=TRUE)))
+}
+
+res_stat_uni = apply(cornell, 2, "stat_uni")
+row.names(res_stat_uni) = c("Nobs", "N_manq.", "Min", "Max", "Moyenne", "Mediane", "Ecart-type")
+
+knitr::kable(round(t(res_stat_uni),3), format = "markdown", align = 'r')
+
+```
+
+On remarque qu'il n'y a aucune valeur manquante. 
+
+
+## Statistiques bivariées
+
+Il existe sept variables explicatives de Y. Pour étudier les statistiques bivariées, nous allons étudier les sept varialbes pour trouver quelles sont les plus correlées avec Y.
+
+
+```{r}
+#calcul des corrélations
+rescor <- cor (cornell$Y , cornell[,-8] ) 
+row.names(rescor) = "Y"
+
+#affichage des corrélations 
+knitr::kable(round (rescor, 3), format="markdown", align ='c') 
+
+```
+On constate que X6 est la variable la plus corrêlée à Y (de plus, elle l'est fortement)
+X1 et X3 sont également très corrêlée à Y.
+Ces variables pourraient donner un bon modèle de regression linéaire. 
+
+
+# Question 2 
+
+## Régression linéaire multiple
+
+Entre Y et toutes les variables Xi
+
+```{r}
+
+m1=lm(Y~., data=cornell)
+summary (m1)
+paste(m1$coefficients)
+
+```
+On constate qu'il y a une valeur manquante pour la variable X7 à cause d'une "singularité" de la variable.  
+
+# Question 3 
+## Vérification sur la somme des variables Xi
+```{r}
+test_somme_ligne <- function( vect) {
+
+  S <- sum(vect[1:7])
+  return( S == 1)
+  
+}
+test_lignes <- apply( cornell, MARGIN = 1 , FUN = test_somme_ligne) 
+print(test_lignes)
+
+```
+
+Chaque ligne du dataframe est bien telle que : la somme des valeurs des Xi vaut 1, soit 100% 
+C'est pour cela que seules six variables suffisent car somme(Xi)=1 donc on peut en définir une telle que : 
+                      Xk = 1 - somme(Xi) i!=k 
+Cela représente la singularité de X7 qui avait causé une valeur manquante dans la régression effectuée à la question précedente. 
+                      
+
+## Matrice de design  
+
+On a vu qu'il existait une colinearite entre nos valeurs puisque la somme de chaque ligne  vaut 1. De ce fait, on ne peut pas trouver la solution qui minimise les moindres carrés : Beta = inv(M)t(X)Y
+
+On va vérifier cela en calculant le déterminant de t(X)X
+
+Si la solution existe, cette matrice doit être inversible
+
+On a déjà remarqué plus haut qu'il n'y a pas de valeur manquante dans cornell. Ainsi, pas besoin d'utiliser la fonction na.omit pour créer un nouveau dataframe sans valeur manquante
+```{r}
+
+X= as.matrix (cbind (rep(1, nrow(cornell)), cornell[,2:7]))
+print(X)
+
+M = t(X) %*% X 
+
+det ( M )
+
+```
+det(M) est de l'ordre de 10e-12 donc on considère que det(M) = 0
+Cela signifie que **M n'est pas inversible**. On confirme bien que la solution minimisant les moindres carrés ne peut être trouvée avec ce modèle 
+
+Il faut procéder à **l'élimination de variables** pour échapper à cette multicolinéarité 
+
+# Question 4 
+## Quels variables éliminer ?
+
+```{r}
+
+m = lm(Y~., data = cornell)
+
+library(leaps)
+choix = regsubsets(Y~., int= T, nbest = 1, nvmax=7, method="exh", data = cornell)
+res = summary(choix)
+print(res)
+#choix du meilleur modèle selon le critère BIC
+plot(choix, scale="bic")
+
+```
+
+### 4.a / Quel est le meilleur modèle ? Combien de variables fait-il rentrer dans la régression ?
+
+On choisit le meilleur modèle comme étant celui ayant le BIC le plus petit petit possible. 
+Le BIC minimum est ici de -47 et il correspond au modèle qui réunit les variables **X1 , X4 et X6**
+(On aurait pu également utiliser R**2 pour choisir le meilleur modèle)
+
+Le meilleur modèle fait donc entrer trois variables dans la régression. 
+
+La fonction regsubsets nous montre que cette configuration représente le meilleur modèle à 3 variables.
+Elle nous donne également les meilleurs modèles, quelque soit le nombre de variables souhaitées. 
+
+### Estimation de ce modèle 
+
+```{r}
+m2=lm(Y~X1+X4+X6, data=cornell)
+summary (m2)
+
+```
+
+* La pvalue est inférieure à 1% : notre modèle statistique est significatif 
+* Le coefficient de détermination vaut 0.9915 : 99.15 % de Y est expliquée par les  variables explicatives X1,X4 et X6
+* Les trois variables sont significatives car leur pvalue sont toutes inférieures à 5%. On remarque tout de même qu'il y a un écart de 10e-3 entre les pvalue de X1 et X4 et celle de X6. X6 semble plus significative encore que les autres. ( au début de l'analyse, on avait déjà remarqué que X6 était la variable la plus corrélée avec Y)
+
+
+### 4.b / Le meilleur modèle à deux variables ? 
+
+```{r}
+res$outmat[2,]
+```
+Grâce à la fonction regsubsets, on constate que le meilleur modèle à deux variables est celui qui réunit **X6 et X7**
+
+# Question 5
+
+## On remplace le BIC utilisé à la question précedente 
+
+Tout d'abord, on étudie tous les autres critères de choix de modèle de manière générale. Ces critères sont: 
+
+* Le R2
+* Le R2 ajusté 
+* Le Cp de Mallows 
+
+
+
+```{r}
+
+par(mfrow=c(2 ,2))
+
+plot(res$bic , xlab =" nb variables " , ylab =" BIC " , type ="l")
+plot(res$rss , xlab =" nb variables " , ylab =" R2 " ,type ="l")
+plot(res$adjr2 , xlab =" nb variables " , ylab =" R2 ajusté " , type ="l")
+plot(res$cp , xlab =" nb variables" , ylab =" Cp " ,type = "l")
+
+which.max(res$adjr2)
+which.min(res$cp)
+which.min(res$bic)
+
+```
+Pour tous les critères, on constate que le meilleur modèle est à trois variables. Nous allons maintenant trouver ces meilleurs modèles pour chaque critère
+
+### *Le meilleur modèle pour le Cp*
+
+
+On cherche le meilleur modèle à trois variables pour le Cp. Ce meilleur correspond à celui dont le Cp est le plus proche de 3+1=4
+```{r}
+plot(choix, scale="Cp")
+```
+Le meilleur modèle à trois variables est celui qui regroupe **X1, X4 et X6** ( même résultat qu'avec le BIC)
+
+Le Cp de ce modèle vaut 0.58. Donc Delta = abs (4-Cp) = 3.42
+
+### *Le meilleur modèle pour le R2*
+
+On cherche le meilleur modèle à trois variables pour le R2. Ce meilleur correspond à celui dont le R2 est maximal
+
+```{r}
+plot(choix, scale="r2") # SERAIT IL POSSIBLE DE CHANGER AXE POUR AVOIR PLUS DE CHIFFRES SIGNIFICATIFS ? IDEM POUR R2 AJUSTE ???????????????????????
+```
+Le meilleur modèle à trois variables est celui qui regroupe **X1, X4 et X6** ( même résultat qu'avec le BIC et Cp)
+Pour ce modèle, le R2 a une valeur de 0.99 ce qui signifie que 99% de l'informationde Y est apportée par les variables explicatives du modèle. 
+
+
+### *Le meilleur modèle pour le R2 ajusté*
+```{r}
+plot(choix, scale="adjr2")
+```
+
+
+De même ici, Le meilleur modèle à trois variables est celui qui regroupe **X1, X4 et X6** ( même résultat qu'avec le BIC , Cp et R2)
+Pour ce modèle, le R2 ajusté a une valeur de 0.99 
+
+# Question 6 

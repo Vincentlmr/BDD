@@ -1,0 +1,457 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Statistique inférentielle},
+  pdfauthor={Vincent Le Meur},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Statistique inférentielle}
+\author{Vincent Le Meur}
+\date{2023}
+
+\begin{document}
+\maketitle
+
+\hypertarget{tp3-tests-dhypothuxe8se-sous-r}{%
+\section{TP3 :Tests d'hypothèse sous
+R}\label{tp3-tests-dhypothuxe8se-sous-r}}
+
+\hypertarget{compte-rendu}{%
+\section{Compte rendu}\label{compte-rendu}}
+
+\hypertarget{question-1}{%
+\subsection{Question 1}\label{question-1}}
+
+\hypertarget{guxe9nuxe9rer-et-stocker-dans-une-matrice-1000-uxe9chantillons-de-taille-n-30-uxe0-partir-de-la-population-de-donnuxe9es-initiale}{%
+\subsubsection{Générer et stocker dans une matrice 1000 échantillons de
+taille n = 30 à partir de la population de données
+initiale}\label{guxe9nuxe9rer-et-stocker-dans-une-matrice-1000-uxe9chantillons-de-taille-n-30-uxe0-partir-de-la-population-de-donnuxe9es-initiale}}
+
+Creation de la matrice:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mat}\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{sample}\NormalTok{(sinistres}\SpecialCharTok{$}\NormalTok{montant, }\AttributeTok{size=}\DecValTok{30}\NormalTok{, }\AttributeTok{replace=}\ConstantTok{TRUE}\NormalTok{),}\AttributeTok{nrow =} \DecValTok{1000}\NormalTok{, }\AttributeTok{ncol =}\DecValTok{30}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{question-2}{%
+\subsection{Question 2}\label{question-2}}
+
+\hypertarget{uxe9crire-une-fonction-permettant-deffectuer-un-test-de-nullituxe9-de-la-moyenne.-cette-fonction-aura-en-paramuxe8tre-un-uxe9chantillon-de-donnuxe9es-luxe9cart-type-sigma-et-le-risque-de-premiuxe8re-espuxe8ce-alpha-et-retournera-1-si-h0-est-rejetuxe9e-et-0-sinon.}{%
+\subsubsection{\texorpdfstring{Écrire une fonction permettant
+d'effectuer un test de nullité de la moyenne. Cette fonction aura en
+paramètre un échantillon de données, l'écart-type \(\sigma\) et le
+risque de première espèce \(\alpha\), et retournera 1 si H0 est rejetée
+et 0
+sinon.}{Écrire une fonction permettant d'effectuer un test de nullité de la moyenne. Cette fonction aura en paramètre un échantillon de données, l'écart-type \textbackslash sigma et le risque de première espèce \textbackslash alpha, et retournera 1 si H0 est rejetée et 0 sinon.}}\label{uxe9crire-une-fonction-permettant-deffectuer-un-test-de-nullituxe9-de-la-moyenne.-cette-fonction-aura-en-paramuxe8tre-un-uxe9chantillon-de-donnuxe9es-luxe9cart-type-sigma-et-le-risque-de-premiuxe8re-espuxe8ce-alpha-et-retournera-1-si-h0-est-rejetuxe9e-et-0-sinon.}}
+
+On rappelle que si la valeur de la statistique est supérieur à la valeur
+critique on peut rejeter l'hypothèse \(H_0\) de nullité de la moyenne:
+
+La formule de la statistique :
+\[ T=\frac{\bar{X_n}-m_0}{\sigma/\sqrt{n}} \]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{test\_moyenne }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(echantillon, sigma, alpha) \{}
+\NormalTok{  n }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(echantillon)}
+\NormalTok{  moyenne }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(echantillon) }
+  
+\NormalTok{  valeur\_critique }\OtherTok{\textless{}{-}} \FunctionTok{qnorm}\NormalTok{(}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ alpha}\SpecialCharTok{/}\DecValTok{2}\NormalTok{)  }\CommentTok{\# valeur critique}
+  
+ 
+\NormalTok{  statistique }\OtherTok{\textless{}{-}}\NormalTok{ (moyenne}\DecValTok{{-}0}\NormalTok{) }\SpecialCharTok{/}\NormalTok{ (sigma }\SpecialCharTok{/} \FunctionTok{sqrt}\NormalTok{(n)) }\CommentTok{\#statistique de test}
+  
+  \CommentTok{\# Test de nullité de la moyenne}
+  \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{abs}\NormalTok{(statistique) }\SpecialCharTok{\textgreater{}}\NormalTok{ valeur\_critique) \{}
+    \FunctionTok{return}\NormalTok{(}\DecValTok{1}\NormalTok{)  }
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
+    \FunctionTok{return}\NormalTok{(}\DecValTok{0}\NormalTok{)  }
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{question-3}{%
+\subsection{Question 3}\label{question-3}}
+
+\hypertarget{parmi-les-1000-uxe9chantillons-guxe9nuxe9ruxe9s-combien-de-fois-peut-on-affirmer-au-risque-alpha-5-que-lindemnisation-moyenne-est-diffuxe9rente-de-650-euros.}{%
+\subsubsection{\texorpdfstring{Parmi les 1000 échantillons générés,
+combien de fois peut-on affirmer au risque \(\alpha\) = 5\% que
+l'indemnisation moyenne est différente de 650
+euros.}{Parmi les 1000 échantillons générés, combien de fois peut-on affirmer au risque \textbackslash alpha = 5\% que l'indemnisation moyenne est différente de 650 euros.}}\label{parmi-les-1000-uxe9chantillons-guxe9nuxe9ruxe9s-combien-de-fois-peut-on-affirmer-au-risque-alpha-5-que-lindemnisation-moyenne-est-diffuxe9rente-de-650-euros.}}
+
+On change la fonction d'avant en changeant 0 par 650:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{test\_moyenne2 }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(echantillon, sigma, alpha) \{}
+\NormalTok{  n }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(echantillon)}
+\NormalTok{  moyenne }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(echantillon) }
+  
+\NormalTok{  valeur\_critique }\OtherTok{\textless{}{-}} \FunctionTok{qnorm}\NormalTok{(}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ alpha}\SpecialCharTok{/}\DecValTok{2}\NormalTok{)  }\CommentTok{\# valeur critique}
+  
+ 
+\NormalTok{  statistique }\OtherTok{\textless{}{-}}\NormalTok{ (moyenne}\DecValTok{{-}650}\NormalTok{) }\SpecialCharTok{/}\NormalTok{ (sigma }\SpecialCharTok{/} \FunctionTok{sqrt}\NormalTok{(n)) }\CommentTok{\#statistique de test}
+  
+  \CommentTok{\# Test de nullité de la moyenne}
+  \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{abs}\NormalTok{(statistique) }\SpecialCharTok{\textgreater{}}\NormalTok{ valeur\_critique) \{}
+    \FunctionTok{return}\NormalTok{(}\DecValTok{1}\NormalTok{)  }
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
+    \FunctionTok{return}\NormalTok{(}\DecValTok{0}\NormalTok{)  }
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+On réutilise la fonction précédente pour trouver le nombre
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sigma }\OtherTok{=} \DecValTok{60}
+\NormalTok{alpha }\OtherTok{=} \FloatTok{0.05}
+
+\NormalTok{res }\OtherTok{=} \FunctionTok{apply}\NormalTok{(mat,}\DecValTok{1}\NormalTok{,test\_moyenne2,sigma,alpha)}
+\NormalTok{nbr\_rejet }\OtherTok{\textless{}{-}}\FunctionTok{length}\NormalTok{(}\FunctionTok{which}\NormalTok{(res}\SpecialCharTok{==}\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\caption{Nombre de rejets}\tabularnewline
+\toprule()
+n & Nombre\_rejets \\
+\midrule()
+\endfirsthead
+\toprule()
+n & Nombre\_rejets \\
+\midrule()
+\endhead
+30 & 500 \\
+\bottomrule()
+\end{longtable}
+
+\hypertarget{question-4}{%
+\subsection{Question 4}\label{question-4}}
+
+\hypertarget{retrouver-la-formule-explicite-de-la-p-value-de-ce-test.-uxe9crire-une-fonction-qui-uxe0-partir-dun-uxe9chantillon-de-donnuxe9es-et-de-luxe9cart-type-sigma-calcule-la-p-value-du-test.}{%
+\subsubsection{\texorpdfstring{Retrouver la formule explicite de la
+p-value de ce test. Écrire une fonction qui à partir d'un échantillon de
+données et de l'écart-type \(\sigma\) calcule la p-value du
+test.}{Retrouver la formule explicite de la p-value de ce test. Écrire une fonction qui à partir d'un échantillon de données et de l'écart-type \textbackslash sigma calcule la p-value du test.}}\label{retrouver-la-formule-explicite-de-la-p-value-de-ce-test.-uxe9crire-une-fonction-qui-uxe0-partir-dun-uxe9chantillon-de-donnuxe9es-et-de-luxe9cart-type-sigma-calcule-la-p-value-du-test.}}
+
+\hypertarget{dans-le-cas-ouxf9-luxe9cart-type-de-la-population-est-connu-sigma-et-en-supposant-une-distribution-normale-la-statistique-de-test-suit-une-distribution-normale-centruxe9e-ruxe9duite}{%
+\subsubsection{\texorpdfstring{Dans le cas où l'écart-type de la
+population est connu (\(\sigma\)), et en supposant une distribution
+normale, la statistique de test suit une distribution normale centrée
+réduite}{Dans le cas où l'écart-type de la population est connu (\textbackslash sigma), et en supposant une distribution normale, la statistique de test suit une distribution normale centrée réduite}}\label{dans-le-cas-ouxf9-luxe9cart-type-de-la-population-est-connu-sigma-et-en-supposant-une-distribution-normale-la-statistique-de-test-suit-une-distribution-normale-centruxe9e-ruxe9duite}}
+
+La formule explicite de la p-value de ce test est:
+\[p-value = 2*(1-\phi(|statistique|)\] Avec comme statistique:
+
+\[\frac{moyenne\ echantillon -m_0}{\sigma/\sqrt{n}}\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p\_value }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(X,moyenne, sigma)\{}
+\NormalTok{  statistique }\OtherTok{\textless{}{-}}\NormalTok{ (}\FunctionTok{mean}\NormalTok{(X)}\SpecialCharTok{{-}}\NormalTok{moyenne)}\SpecialCharTok{/}\NormalTok{(sigma}\SpecialCharTok{/}\FunctionTok{sqrt}\NormalTok{(}\FunctionTok{length}\NormalTok{(X)))}
+\NormalTok{  p\_val }\OtherTok{\textless{}{-}} \DecValTok{2}\SpecialCharTok{*}\NormalTok{(}\DecValTok{1}\SpecialCharTok{{-}}\FunctionTok{pnorm}\NormalTok{(}\FunctionTok{abs}\NormalTok{(statistique)))}
+  \FunctionTok{return}\NormalTok{(p\_val)}
+\NormalTok{\}}
+\NormalTok{sigma }\OtherTok{=} \DecValTok{60}
+\NormalTok{p\_values }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(mat, }\DecValTok{1}\NormalTok{, p\_value,}\DecValTok{650}\NormalTok{, sigma)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{question-5}{%
+\subsection{Question 5}\label{question-5}}
+
+\hypertarget{retrouver-la-formule-explicite-de-la-puissance-de-ce-test.-uxe9crire-une-fonction-qui-uxe0-partir-de-n-de-sigma-de-sigma-et-de-delta-mu_1---mu_0-ouxf9-mu_1-est-la-vraie-valeur-de-mu-sous-h1-calcule-la-puissance-du-test.}{%
+\subsubsection{\texorpdfstring{Retrouver la formule explicite de la
+puissance de ce test. Écrire une fonction qui à partir de n, de
+\(\sigma\), de \(\sigma\) et de \(\delta\) = \(\mu_1\) - \(\mu_0\) (où
+\(\mu_1\) est la ``vraie'' valeur de \(\mu\) sous H1) calcule la
+puissance du
+test.}{Retrouver la formule explicite de la puissance de ce test. Écrire une fonction qui à partir de n, de \textbackslash sigma, de \textbackslash sigma et de \textbackslash delta = \textbackslash mu\_1 - \textbackslash mu\_0 (où \textbackslash mu\_1 est la ``vraie'' valeur de \textbackslash mu sous H1) calcule la puissance du test.}}\label{retrouver-la-formule-explicite-de-la-puissance-de-ce-test.-uxe9crire-une-fonction-qui-uxe0-partir-de-n-de-sigma-de-sigma-et-de-delta-mu_1---mu_0-ouxf9-mu_1-est-la-vraie-valeur-de-mu-sous-h1-calcule-la-puissance-du-test.}}
+
+La formule de la puissance du test est:
+
+\[P=1-\beta=1-P\bigg(q_\frac{\alpha}{2}-\delta*\frac{\sqrt{n}}{\sigma/\sqrt{n}}\bigg)+P\bigg(-q_\frac{\alpha}{2}-\delta*\frac{\sqrt{n}}{\sigma/\sqrt{n}}\bigg)\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{puissance }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(n,sigma,alpha,delta)\{}
+  \FunctionTok{return}\NormalTok{(}\DecValTok{1} \SpecialCharTok{{-}} \FunctionTok{pnorm}\NormalTok{((}\FunctionTok{qnorm}\NormalTok{(}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ alpha}\SpecialCharTok{/}\DecValTok{2}\NormalTok{) }\SpecialCharTok{{-}}\NormalTok{ delta }\SpecialCharTok{*} \FunctionTok{sqrt}\NormalTok{(n)) }\SpecialCharTok{/}\NormalTok{ (sigma }\SpecialCharTok{/} \FunctionTok{sqrt}\NormalTok{(n))) }\SpecialCharTok{+} \FunctionTok{pnorm}\NormalTok{((}\SpecialCharTok{{-}}\FunctionTok{qnorm}\NormalTok{(}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ alpha}\SpecialCharTok{/}\DecValTok{2}\NormalTok{) }\SpecialCharTok{{-}}\NormalTok{ delta }\SpecialCharTok{*} \FunctionTok{sqrt}\NormalTok{(n)) }\SpecialCharTok{/}\NormalTok{ (sigma }\SpecialCharTok{/} \FunctionTok{sqrt}\NormalTok{(n))))}
+  
+\NormalTok{\}}
+
+\NormalTok{puis }\OtherTok{\textless{}{-}} \FunctionTok{puissance}\NormalTok{(}\DecValTok{30}\NormalTok{,sigma,alpha,}\DecValTok{650}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\caption{Puissance du test}\tabularnewline
+\toprule()
+n & Puissance \\
+\midrule()
+\endfirsthead
+\toprule()
+n & Puissance \\
+\midrule()
+\endhead
+30 & 1 \\
+\bottomrule()
+\end{longtable}
+
+\hypertarget{question-6}{%
+\subsection{Question 6}\label{question-6}}
+
+\hypertarget{en-fixant-alpha-5-tracer-la-puissance-du-test-pour-n-30-50-et-100-en-fonction-de-delta-in-50-50.}{%
+\subsubsection{\texorpdfstring{En fixant \(\alpha\) = 5\%, tracer la
+puissance du test pour n = 30, 50 et 100 en fonction de \(\delta\)
+\(\in\){[}-50,
+50{]}.}{En fixant \textbackslash alpha = 5\%, tracer la puissance du test pour n = 30, 50 et 100 en fonction de \textbackslash delta \textbackslash in{[}-50, 50{]}.}}\label{en-fixant-alpha-5-tracer-la-puissance-du-test-pour-n-30-50-et-100-en-fonction-de-delta-in-50-50.}}
+
+\hypertarget{schuxe9ma}{%
+\subsubsection{Schéma}\label{schuxe9ma}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha}\OtherTok{=}\FloatTok{0.05}
+\NormalTok{alpha }\OtherTok{\textless{}{-}} \FloatTok{0.05}
+\NormalTok{n }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{30}\NormalTok{, }\DecValTok{50}\NormalTok{, }\DecValTok{100}\NormalTok{)}
+\NormalTok{delta }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{50}\NormalTok{, }\DecValTok{50}\NormalTok{, }\AttributeTok{by =} \DecValTok{1}\NormalTok{)}
+\NormalTok{l }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(delta)}
+
+\CommentTok{\# Initialiser les vecteurs d\textquotesingle{}ordonnées pour chaque valeur de n}
+\NormalTok{ordonnees\_30 }\OtherTok{\textless{}{-}}\NormalTok{ delta}
+\NormalTok{ordonnees\_50 }\OtherTok{\textless{}{-}}\NormalTok{ delta}
+\NormalTok{ordonnees\_100 }\OtherTok{\textless{}{-}}\NormalTok{ delta}
+
+\CommentTok{\# Calculer les ordonnées pour chaque valeur de n}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{l) \{}
+\NormalTok{  ordonnees\_30[i] }\OtherTok{\textless{}{-}} \FunctionTok{puissance}\NormalTok{(n[}\DecValTok{1}\NormalTok{], sigma, alpha, delta[i])}
+\NormalTok{  ordonnees\_50[i] }\OtherTok{\textless{}{-}} \FunctionTok{puissance}\NormalTok{(n[}\DecValTok{2}\NormalTok{], sigma, alpha, delta[i])}
+\NormalTok{  ordonnees\_100[i] }\OtherTok{\textless{}{-}} \FunctionTok{puissance}\NormalTok{(n[}\DecValTok{3}\NormalTok{], sigma, alpha, delta[i])}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{TP3_files/figure-latex/unnamed-chunk-11-1.pdf}
+
+\hypertarget{question-7}{%
+\subsection{Question 7}\label{question-7}}
+
+\hypertarget{refaire-les-questions-5-et-6-en-utilisant-la-fonction-pwr.norm.test-disponible-dans-le-package}{%
+\subsubsection{Refaire les questions 5 et 6 en utilisant la fonction
+pwr.norm.test disponible dans le
+package}\label{refaire-les-questions-5-et-6-en-utilisant-la-fonction-pwr.norm.test-disponible-dans-le-package}}
+
+pwr. On rappelle que la fonction pour charger un package déjà installé
+sur le système est library, et que des nouveaux packages peuvent être
+téléchargés et installés à partir des dépôts CRAN à l'aide de la
+fonction install.packages
+
+\hypertarget{q5}{%
+\subsubsection{Q5}\label{q5}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(pwr)}
+
+\NormalTok{n }\OtherTok{\textless{}{-}} \DecValTok{30}  
+\NormalTok{sigma }\OtherTok{\textless{}{-}} \DecValTok{60} 
+\NormalTok{alpha }\OtherTok{\textless{}{-}} \FloatTok{0.05}  
+\NormalTok{delta }\OtherTok{\textless{}{-}} \DecValTok{650}  \CommentTok{\# (mu1 {-} mu0)}
+
+
+\NormalTok{Puissance }\OtherTok{\textless{}{-}} \FunctionTok{pwr.norm.test}\NormalTok{(}\AttributeTok{n =}\NormalTok{n, }\AttributeTok{d =}\NormalTok{ delta }\SpecialCharTok{/}\NormalTok{ sigma, }\AttributeTok{sig.level =}\NormalTok{ alpha, }\AttributeTok{alternative =} \StringTok{"two.sided"}\NormalTok{)}\SpecialCharTok{$}\NormalTok{power}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lr@{}}
+\caption{Puissance avec pwr.norm.test}\tabularnewline
+\toprule()
+n & Puissance \\
+\midrule()
+\endfirsthead
+\toprule()
+n & Puissance \\
+\midrule()
+\endhead
+30 & 1 \\
+\bottomrule()
+\end{longtable}
+
+\hypertarget{q6}{%
+\subsubsection{Q6}\label{q6}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha}\OtherTok{=}\FloatTok{0.05}
+\NormalTok{alpha }\OtherTok{\textless{}{-}} \FloatTok{0.05}
+\NormalTok{n }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{30}\NormalTok{, }\DecValTok{50}\NormalTok{, }\DecValTok{100}\NormalTok{)}
+\NormalTok{delta }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{50}\NormalTok{, }\DecValTok{50}\NormalTok{, }\AttributeTok{by =} \DecValTok{1}\NormalTok{)}
+\NormalTok{l }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(delta)}
+
+\CommentTok{\# Initialiser les vecteurs d\textquotesingle{}ordonnées pour chaque valeur de n}
+\NormalTok{ordonnees\_30 }\OtherTok{\textless{}{-}}\NormalTok{ delta}
+\NormalTok{ordonnees\_50 }\OtherTok{\textless{}{-}}\NormalTok{ delta}
+\NormalTok{ordonnees\_100 }\OtherTok{\textless{}{-}}\NormalTok{ delta}
+
+\CommentTok{\# Calculer les ordonnées pour chaque valeur de n}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{l) \{}
+\NormalTok{  ordonnees\_30[i] }\OtherTok{\textless{}{-}} \FunctionTok{pwr.norm.test}\NormalTok{(}\AttributeTok{n =}\NormalTok{n[}\DecValTok{1}\NormalTok{], }\AttributeTok{d =}\NormalTok{ delta[i] }\SpecialCharTok{/}\NormalTok{ sigma, }\AttributeTok{sig.level =}\NormalTok{ alpha, }\AttributeTok{alternative =} \StringTok{"two.sided"}\NormalTok{)}\SpecialCharTok{$}\NormalTok{power}
+\NormalTok{  ordonnees\_50[i] }\OtherTok{\textless{}{-}} \FunctionTok{pwr.norm.test}\NormalTok{(}\AttributeTok{n =}\NormalTok{n[}\DecValTok{2}\NormalTok{], }\AttributeTok{d =}\NormalTok{ delta[i] }\SpecialCharTok{/}\NormalTok{ sigma, }\AttributeTok{sig.level =}\NormalTok{ alpha, }\AttributeTok{alternative =} \StringTok{"two.sided"}\NormalTok{)}\SpecialCharTok{$}\NormalTok{power}
+\NormalTok{  ordonnees\_100[i] }\OtherTok{\textless{}{-}} \FunctionTok{pwr.norm.test}\NormalTok{(}\AttributeTok{n =}\NormalTok{n[}\DecValTok{3}\NormalTok{], }\AttributeTok{d =}\NormalTok{ delta[i] }\SpecialCharTok{/}\NormalTok{ sigma, }\AttributeTok{sig.level =}\NormalTok{ alpha, }\AttributeTok{alternative =} \StringTok{"two.sided"}\NormalTok{)}\SpecialCharTok{$}\NormalTok{power}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{TP3_files/figure-latex/unnamed-chunk-15-1.pdf} \#\#
+Question 8
+
+\hypertarget{en-fixant-alpha-5-calculer-le-nombre-dobservations-nuxe9cessaires-pour-que-le-risque-de-seconde}{%
+\subsubsection{\texorpdfstring{En fixant \(\alpha\) = 5\%, calculer le
+nombre d'observations nécessaires pour que le risque de
+seconde}{En fixant \textbackslash alpha = 5\%, calculer le nombre d'observations nécessaires pour que le risque de seconde}}\label{en-fixant-alpha-5-calculer-le-nombre-dobservations-nuxe9cessaires-pour-que-le-risque-de-seconde}}
+
+espèce ne dépasse pas 10\% pour \(\delta\) = 20.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(pwr)}
+
+\NormalTok{alpha }\OtherTok{\textless{}{-}} \FloatTok{0.05}
+\NormalTok{delta }\OtherTok{\textless{}{-}} \DecValTok{20}
+\NormalTok{puiss }\OtherTok{\textless{}{-}} \FloatTok{0.9}
+
+\CommentTok{\# Calcul du nombre d\textquotesingle{}observations nécessaires}
+\NormalTok{n }\OtherTok{\textless{}{-}} \FunctionTok{ceiling}\NormalTok{(}\FunctionTok{pwr.norm.test}\NormalTok{(}\AttributeTok{d =}\NormalTok{ delta}\SpecialCharTok{/}\NormalTok{sigma, }\AttributeTok{power =} \FloatTok{0.9}\NormalTok{, }\AttributeTok{sig.level =}\NormalTok{ alpha, }\AttributeTok{alternative =} \StringTok{"two.sided"}\NormalTok{)}\SpecialCharTok{$}\NormalTok{n)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}r@{}}
+\caption{nombre d'observations nécessaires pour que le risque de seconde
+espèce ne dépasse pas 10\%}\tabularnewline
+\toprule()
+Nombre\_d\_observation \\
+\midrule()
+\endfirsthead
+\toprule()
+Nombre\_d\_observation \\
+\midrule()
+\endhead
+95 \\
+\bottomrule()
+\end{longtable}
+
+\end{document}

@@ -1,0 +1,26 @@
+DROP table if exists passe;
+DROP table if exists Station;
+DROP table if exists Bus;
+
+
+create table bus(
+    Idbus integer PRIMARY KEY,
+    Nombus varchar(30)
+    );
+
+create table station(
+    Idstation integer PRIMARY KEY,
+    Nomstation varchar(30)
+    );
+
+create table passe(
+    Idbus integer references bus,
+    Idstation integer references station,
+    PRIMARY KEY(Idbus, Idstation)
+    );
+    
+insert into station (Idstation , Nomstation) values(1,'Bois'),(2,'Mairie'),(3,'Plage'),(4,'Poste'),(5,'Port');
+
+insert into bus (Idbus, Nombus) values(1,'F45'),(2,'D21'),(3,'C04');
+
+insert into passe (Idbus, Idstation) values (1,1),(2,1),(2,3),(3,3),(1,2),(3,2),(1,5),(2,5),(3,4),(2,4);

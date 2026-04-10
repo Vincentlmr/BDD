@@ -1,0 +1,331 @@
+---
+title: "TP3_RL"
+author: "Vincent LE MEUR"
+date: '2023-05-12'
+output: pdf_document
+---
+
+```{r setup, include=FALSE ,warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# TP3 : Séléction de modèle
+
+# Compte rendu
+
+
+Dans un premier on importe le fichier csv:
+
+```{r  ,echo=TRUE ,warning=FALSE}
+library(readr)
+cornell <- read_csv("cornell.csv")
+```
+
+```{r  ,echo=FALSE }
+library(knitr)
+kable(cornell, caption = "Données Cornell")
+```
+
+## Question 1 :
+
+### Réaliser les statistiques descriptives univariées et bivariées (y versus les autres variables)
+
+On réalise dans un premier temps la descriptive univariéés:
+
+```{r  ,echo=TRUE ,warning=FALSE}
+summary(cornell)
+```
+
+On réalise ensuite la descriptive bivariéés:
+
+```{r  ,echo=FALSE ,warning=FALSE}
+library(knitr)
+
+
+# Calcul des corrélations
+corr_table <- matrix(NA, nrow = 2, ncol = 7)
+corr_table[1, ] <- c(cor(cornell$Y, cornell$X1, use = "pairwise.complete.obs"),
+                     cor(cornell$Y, cornell$X2, use = "pairwise.complete.obs"),
+                     cor(cornell$Y, cornell$X5, use = "pairwise.complete.obs"),
+                     cor(cornell$Y, cornell$X4, use = "pairwise.complete.obs"),
+                     cor(cornell$Y, cornell$X5, use = "pairwise.complete.obs"),
+                     cor(cornell$Y, cornell$X6, use = "pairwise.complete.obs"),
+                     cor(cornell$Y, cornell$X7, use = "pairwise.complete.obs"))
+
+corr_table[2, ] <- c("X1", "X2", "X5", "X4", "X5", "X6", "X7")
+
+# Création du tableau avec kable
+kable(t(corr_table), col.names = c("Y", ""),
+                      caption = "Tableau des corrélations entre Y et les autres variables")
+
+
+
+```
+On constate que X6 est la variable la plus corrêlée à Y
+
+
+```{r, echo = FALSE}
+
+par(mfrow = c(2,4))
+
+hist(cornell$X1, xlab = "X1", ylab = "fréquence", col="blue", main = "X1")
+hist(cornell$X2, xlab = "X2", ylab = "fréquence", col="blue", main = "X2")
+hist(cornell$X3, xlab = "X3", ylab = "fréquence", col="blue", main = "X3")
+hist(cornell$X4, xlab = "X4", ylab = "fréquence", col="blue", main = "X4")
+hist(cornell$X5, xlab = "X5", ylab = "fréquence", col="blue", main = "X5")
+hist(cornell$X6, xlab = "X6", ylab = "fréquence", col="blue", main = "X6")
+hist(cornell$X7, xlab = "X7", ylab = "fréquence", col="blue", main = "X7")
+
+hist(cornell$Y, xlab = "Y", ylab = "frÃ©quence", col="red", main = "Y")
+
+title("Histogrames", outer=TRUE, line=-1)
+```
+
+
+```{r, echo = FALSE, comment=""}
+par(mfrow=c(3,3))
+for(i in 1:ncol(cornell))
+ {
+ boxplot(cornell[,names(cornell)[i]], xlab = names(cornell)[i], ylab = names(cornell)[i], col = ifelse(i==8, "red","blue"))  
+ }
+title("Boites Ã  moustaches", outer=TRUE, line=-1)
+```
+
+
+## Question 2 :
+
+Réaliser le modèle de régression linéaire entre y et toutes les autres variables (fonction R : lm).
+Que constatez vous ?
+
+```{r  ,echo=TRUE ,warning=FALSE}
+m1 = lm(Y~.,cornell)
+summary(m1)
+```
+On remarque que la qualité globale du modèle est de 0.99, ce qui montre la bonne capacité du modèle. 
+De plus on observe une singularité dans la variable au niveaux de la variable 7 où il manque une valeur.
+
+Ensuite on continue à observer le modèle:
+
+```{r  ,echo=FALSE ,warning=FALSE}
+qqnorm(m1$residuals,col="red")
+qqline(m1$residuals,col="blue")
+
+```
+
+
+```{r  ,echo=FALSE ,warning=FALSE}
+shapiro.test(m1$residuals)
+
+```
+La p-value du test de shapito est inférieur à 0,05 ce que l'on observe aussi sur le QQ-plot ou les résidu on du mal à suivre une distribution normale.
+
+##### Homoscédasticité:
+
+```{r, echo = FALSE}
+plot(na.omit(cornell$Y), m1$residuals, xlab = "Y", ylab = "Résidus ", main = "Homoscédasticité de m1")
+```
+
+
+
+Et le test pour homoscédasticité : Breuch-Pagan :
+
+```{r, echo = FALSE}
+library(lmtest)
+bptest(m1)
+```
+De même pour l'hoscédasticité la p-value du test de Breush Pagan est inférieur à 0.05 ce qui montre qu'elle n'est pas respectée.
+
+##### Indéprendance des résidus
+
+Test de Durbin-Watson :
+
+```{r, echo = FALSE}
+library(lmtest)
+dwtest(m1)
+
+```
+Le DW du test est de 1.6 proche de 2 donc les résidus sont non corrélés.
+
+##### Etude de l'influence des observations
+
+On regarde les leviers $h_{ii}$ :
+  
+```{r, echo = FALSE}
+m1inf=lm.influence(m1)
+str(m1inf)
+
+plot(1:nrow(cornell), m1inf$hat, xlab="observations", ylab = "leviers", type="h", 
+     main = "Observations influentes dans le modèle")
+abline(h=2/nrow(cornell), col="blue", lty=2)
+abline(h=3/nrow(cornell), col="red", lty=2)
+legend("topleft", c("2/n", "3/n"), lty=c(2,2), col=c("blue", "red"), title = "limite:")
+```
+
+## Question 3
+
+ Puisque n =12 > p=7, il ne reste qu'à vérifier qu'il n'y a pas une relation entre les variables
+explicatives (multi-collinéarité). En effet, les variables X's représentent les taux de chaque
+composante dans l'essence. Du coup, la somme sur ligne doit faire 100%. Vérifier (fonction apply).
+Donc on n'a pas besoin de toutes les 7 variables puisque 6 suffisent ! On calculera aussi le
+déterminant de la matrice XTX (voir cours). Utiliser la foction det en R.
+
+### Vérification sur la somme des variables Xi
+
+```{r}
+test_somme_ligne <- function( vect) {
+
+  S <- sum(vect[1:7])
+  return( S == 1)
+  
+}
+test_lignes <- apply( cornell, MARGIN = 1 , FUN = test_somme_ligne) 
+print(test_lignes)
+
+```
+On remarque bien que la somme des xi vaut 1.
+Donc on n'a pas besoin de toutes les 7 variables puisque 6 suffisent ! Ce qui est explique la sigularité de la variable X7.
+
+### Matrice de design  
+
+### Calculer la matrice X'X
+
+```{r}
+X= as.matrix (cbind (rep(1, nrow(cornell)), cornell[,2:7]))
+library(knitr)
+
+
+# Afficher la matrice X avec kable
+kable(X, caption = "Matrice X")
+
+
+
+XtX <- t(X) %*% X
+
+# Calculer le déterminant de la matrice X'X
+determinant <- det(XtX)
+determinant
+
+```
+det(M) est de l'ordre de 10e-12 donc on considère que det(M) = 0
+Cela signifie que **M n'est pas inversible**. On confirme bien que la solution minimisant les moindres carrés ne peut être trouvée avec ce modèle 
+
+## Question 4
+
+### On ne peut pas donc faire un modèle avec toutes les variables. Mais lesquelles éliminer ? On procédera à une sélection des variables. Explorez la fonction regsubsets du package « leaps »
+
+```{r}
+m = lm(Y~., data = cornell)
+summary(m)
+library(leaps)
+choix = regsubsets(Y~., int= T, nbest = 1, nvmax=7, method="exh", data = cornell)
+res = summary(choix)
+print(res)
+#choix du meilleur modèle selon le critère BIC
+plot(choix, scale="bic")
+```
+
+### a) Quel est le meilleur modèle ? Combien de variables fait-il rentrer dans la régression ? Estimer ce modèle, analyser la validité et les performances du modèle complet (R2, significativité coefficients). 
+
+On choisit le meilleur modèle comme étant celui ayant le BIC le plus petit petit possible. 
+On observe que le BIC le plus petit est -47. 
+ les variable **X1,X4 et X6** rentrent alors dans la régression. 
+ 
+### Estimation de ce modèle 
+
+```{r}
+m2=lm(Y~X1+X4+X6, data=cornell)
+summary (m2)
+
+```
+La pvalue est inférieure à 1%, cela implique que le modèle statistique est significatif 
+On à un coefficient de détermination du modèle de 99%    
+La p-value de X1, X4 et X6 est inférieure à 0.5 donc ces variables sont significatives.
+
+### b) quel est le meilleur modèle avec deux variables ? 
+
+```{r}
+res$outmat[2,]
+```
+On constate que le meilleur modèle à deux variables est celui qui réunit **X6 et X7**
+
+## Question 5
+
+### Remplacer précédemment le critère BIC par le critère Cp, R2 ajusté (adjr2) ou encore R2.(évidemment AIC donne le mêmes résultats que BIC à cause du lien entre les deux critères).Préciser pour chaque critère le meilleur modèle. 
+
+On remplace le BIC utilisé à la question précedente 
+
+```{r}
+
+par(mfrow=c(2 ,2))
+
+plot(res$bic , xlab =" nb variables " , ylab =" BIC " , type ="l")
+plot(res$rss , xlab =" nb variables " , ylab =" R2 " ,type ="l")
+plot(res$adjr2 , xlab =" nb variables " , ylab =" R2 ajusté " , type ="l")
+plot(res$cp , xlab =" nb variables" , ylab =" Cp " ,type = "l")
+
+which.max(res$adjr2)
+which.min(res$cp)
+
+```
+Pour tous les critères, on constate que le meilleur modèle est à trois variables. 
+Nous allons maintenant trouver ces meilleurs modèles pour chaque critère
+
+```{r}
+plot(choix, scale="Cp")
+```
+
+Le meilleur modèle pour Cp est celui qui contient les variables **X1, X2 et X3**.
+
+```{r}
+plot(choix, scale="r2") 
+```
+
+Pour R2 on ne peut pas distinguer 3 variables car à 0.99 on à toutes les variables sauf X7.
+
+On est conclu que le meilleur modèle est le modèle qui contient les varaible **X1, X2 et X3**.
+
+## Question 6
+
+###Les recherches précédentes étaient exhaustives. Cela pose un problème lorsque le nombre de variables est grand. Faisons une sélection de variables pas-à-pas. 
+
+```{r}
+library(MASS)
+m_0 <- lm(Y ~ 1, data=cornell) # modele sans aucune variable explicative
+m_all <- lm(Y ~ ., data=cornell) # modele avec toutes les variables
+m_back = stepAIC(m_all,direction="backward")
+m_forw = stepAIC(m_0,direction="forward",scope=list(upper=m_all,lower=m_0))
+m_stepwise = stepAIC(m_0,direction="both",scope=list(upper=m_all,lower=m_0))
+```
+
+
+```{r}
+press <- function(fit) {
+  h <- lm.influence(fit)$hat
+  return(sqrt(mean((residuals(fit) / (1 - h))^2)))
+}
+
+# Calcul du PRESS pour chaque modèle
+press_back <- press(m_back)
+press_forw <- press(m_forw)
+press_stepwise <- press(m_stepwise)
+
+```
+
+```{r,echo=FALSE}
+
+# Comparaison des modèles
+library(knitr)
+
+# Créer le data frame avec les valeurs de PRESS
+press_values <- data.frame(Method = c("Backward", "Forward", "Stepwise"),
+                           PRESS = c(press_back, press_forw, press_stepwise))
+
+# Afficher le tableau avec kable
+kable(press_values, caption = "Comparaison des méthodes de sélection selon le PRESS")
+
+```
+Le meilleur modèle est celui forward qui obtient le PRESS le plus faible
+
+
+
+

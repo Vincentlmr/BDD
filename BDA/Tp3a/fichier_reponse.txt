@@ -1,0 +1,66 @@
+
+I)
+    3) 271 select count(id) from station;
+    4)4
+II)
+    1) select * from compteur; 
+    2) select count(*) from compteur; 
+    3) select id,count(*) from compteur group by id;
+    Les 2 premières commande s'effectuent de la mm façon et le dernier il y à de la memoire et met plus de temsp à s'effctuer
+    
+III)
+    1) select distinct compteur.service,count(service) as occ  from compteur group by service;
+    
+    2)explain analyse select id from compteur where service='OUT_OF_SERVICE';
+    
+    3) create index index_service on compteur(service);
+    
+    4) le temps à diminuer
+    
+    5)drop index index_service;
+    
+IV)
+    1)select distinct id,heure from compteur where nbvelo>10 and nbplace=3;
+
+    2)a) 0.152 ms Planning time
+         23.850 ms ExecutionTime
+     b) 0.254 ms
+        15.443 ms
+     c) 0456
+        6.021
+     d)0.630 ms
+        5.905 ms
+     e)0.238ms
+        4.916ms
+    On êut en conclure que ça change rien dans tous les cas quand on à au moins 1 index;
+V)
+    1)select id, heure from compteur where nbplace>24 and service='HORS SERVICE';
+    2)
+        a)24 ms d'Execution
+        b)25 ms
+        c)3 ms
+        d)19ms
+    le where change rien
+    
+VI)
+    1) select id, heure from compteur where nbplace+nbvalo>26;
+    2) 25 ms
+    3) 25 ms
+    4) 25 ms
+    5) on en conclu que plus la capacité est élévé plus c rapide
+    
+VII)
+    1)select id,heure from compteur where nbplace>29;
+    2)19ms
+    3)2ms
+    4)2ms
+    
+VIII)
+    1)pas besoin d'index 
+    2)create index index_tpe on compteur(tpe);
+    3)create index index_fonc on compteur(nbplace+nbvalo);
+    
+    
+
+    
+    

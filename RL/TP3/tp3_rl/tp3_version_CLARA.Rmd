@@ -1,0 +1,38 @@
+---
+title: "TP3 REGRESSION LINEAIRE"
+output: html_document
+date: '2022-05-13'
+---
+# Importation de la table 
+```{r}
+library (dplyr)
+
+cornell <- read.csv("/home/c/b/cbaldacc/Linux/RL/TP3/cornell.csv", dec = ".", sep = ",", header = TRUE)
+
+```
+
+#Q1. Statistiques descriptives univariées et bivariées
+## D'abord, les statistiques descriptives univariées : 
+```{r}
+stat_uni = function(x)
+  {
+  return(c(length(na.omit(x)),
+         length(x[is.na(x)]),
+         min(x, na.rm=TRUE),
+         max(x, na.rm=TRUE),
+         mean(x, na.rm=TRUE),
+         median(x, na.rm=TRUE),
+         sd(x, na.rm=TRUE)))
+  }
+res_stat_uni = apply(cornell, 2, "stat_uni")
+row.names(res_stat_uni) = c("Nobs", "N_manq.", "Min", "Max", "Moyenne", "Mediane", "Ecart-type")
+knitr::kable(round(t(res_stat_uni),3), format = "markdown", align = 'r')
+```
+##Ensuite, les statistiques descriptives bivariées : 
+
+
+
+
+
+
+

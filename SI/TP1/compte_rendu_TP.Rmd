@@ -1,0 +1,162 @@
+---
+title: "Statistique inférentielle"
+author: "Vincent Le Meur"
+output: pdf_document
+date: '2023'
+---
+
+```{r setup, include=FALSE ,warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# TP1 : Estimateurs du maximum de vraisemblance
+
+## Conte rendu
+
+### Question 1
+
+Générer un échantillon aléatoire {X1, . . . , Xn} de taille n = 30, 50, 80 provenant des données fournies et représenter graphiquement sa distribution:
+
+On importe le dossier provenant du dossier fiabilites.csv en faisant bien attention à correctement l'importer et éviter qu'il génére 2 colonnes du aux virgules.
+
+```{r , echoe=TRUE ,warning=FALSE}
+library(readr)
+fiabilites <- read_delim("fiabilites.csv", 
+    "\t", escape_double = FALSE, col_names = FALSE, 
+    locale = locale(decimal_mark = ",", grouping_mark = ""), 
+    trim_ws = TRUE)
+View(fiabilites)
+```
+
+Ensuite on génère des échantillons aléatoires de taille 30,50 puis 80.
+
+```{r, echoe=TRUE ,warning=FALSE}
+echantillon1<-sample(fiabilites$X1,30)
+echantillon2<-sample(fiabilites$X1,50)
+echantillon3<-sample(fiabilites$X1,80)
+
+summary(echantillon1)
+summary(echantillon2)
+summary(echantillon3)
+
+```
+
+Et enfin on s'occupe de l'affichage des différents graphiques en fonction des différents échantillons.
+
+```{r , echoe=TRUE ,warning=FALSE}
+
+par(mfrow = c(2,2))
+
+hist(echantillon1)
+hist(echantillon2)
+hist(echantillon3)
+
+title("Distribution", outer=TRUE, line=-1)
+
+```
+
+### Question 2
+
+Écrire une fonction qui calcule la log-vraisemblance pour {X1, . . . , Xn} en $\mu$ et $\sigma$:
+
+On utilise l'expression de la densité du cours formule du cours:
+
+```{r , echoe=TRUE ,warning=FALSE}
+
+LogVraisemblance <- function(parametres, echantillon){
+  mu=parametres[0]
+  sigma=parametres[1]
+  n <- length(echantillon)
+  logv <- -(n/2)*log(2*pi*(sigma^2)) - sum(log(echantillon)) - (1/(2*sigma^2))*sum((log(echantillon)-mu)^2)
+  return(-logv) 
+}
+
+```
+
+### Question 3
+
+À l'aide des fonctions d'optimisation de R, estimer les paramètres $\mu$ et $\sigma$ par la méthode du maximum de vraisemblance pour n = 30, 50, 80.
+
+```{r , echoe=TRUE ,warning=FALSE}
+
+optim1  <- optim(c(1,1), LogVraisemblance, echantillon=echantillon1)
+optim2 <- optim(c(1,1), LogVraisemblance, echantillon=echantillon2)
+optim3 <- optim(c(1,1), LogVraisemblance, echantillon=echantillon3)
+
+```
+
+### Question 4
+
+Retrouver de manière analytique les estimateurs du maximum de vraisemblance des paramètres $\mu$ et $\sigma$. Calculez-les pour n = 30, 50, 80 et comparer aux résultats de la question précédente.
+
+On utilise la formule du cours pour les stimations de $\mu$ et $\sigma$:
+
+$\mu =(1/n) sum(log(X))$ (En remplaçant les Xi par les log(Xi))
+
+```{r , echoe=TRUE ,warning=FALSE}
+mu1= (1/30)*sum(log(echantillon1)) 
+mu2= (1/50)*sum(log(echantillon2)) 
+mu3= (1/80)*sum(log(echantillon3))
+
+```
+
+Pour l'écart type on prend la racine carée de la variance $\sigma = \sqrt((1/(n-1)*sum((log(X)-mu)^2))$
+
+```{r , echoe=TRUE ,warning=FALSE}
+sigma1= sqrt((1/29)*sum((log(echantillon1-mu1)^2))) 
+sigma2= sqrt((1/49)*sum((log(echantillon2-mu2)^2))) 
+sigma3= sqrt((1/79)*sum((log(echantillon3-mu3)^2)))
+
+```
+
+On utilise la fonction précédente:
+
+```{r , echoe=TRUE ,warning=FALSE}
+
+
+LogVraisemblance(c(mu1,sigma1), echantillon1)
+LogVraisemblance(c(mu1,sigma1), echantillon2)
+LogVraisemblance(c(mu1,sigma1), echantillon3)
+
+```
+
+### Question 5
+
+Calculer la moyenne et la variance empirique de {X1, . . . , Xn} pour n = 30, 50, 80. Exprimer les paramètres $\mu$ et $\sigma$ en fonction de l'espérance et de la variance des Xi . En déduire des nouveaux estimateurs des paramètres $\mu$ et $\sigma$.
+
+La formule de la moyenne empirique est: $moy = (1/n)*sum(Xi)$
+
+```{r , echoe=TRUE ,warning=FALSE}
+moy1 = (1/30)*sum(echantillon1)
+moy2 = (1/50)*sum(echantillon2)
+moy3 = (1/80)*sum(echantillon3)
+
+```
+
+La formule de la variance empirique est: $var = (1/n-1)*sum(Xi-moy)^2$
+
+```{r , echoe=TRUE ,warning=FALSE}
+var1 = (1/29)*sum((echantillon1-moy1)^2)
+var2 = (1/49)*sum((echantillon2-moy2)^2)
+var3 = (1/79)*sum((echantillon3-moy3)^2)
+```
+
+En utilisant les parametre $\mu$ et $\sigma$ on à alors:
+
+$\mu = log(E[Xi]) - (log(1+ (V[Xi]/(E[Xi^2]))))/2$
+
+et $\sigma=\sqrt(log(1+ (V[Xi]/(E[Xi^2]))))$
+
+```{r , echoe=TRUE ,warning=FALSE}
+Parametres <- function(moy,var){
+  sigma <- sqrt(log(1 + (var/moy^2)))
+  mu  <- log(moy) - (log(1 + (var/(moy^2))))/2
+  return (c(mu,sigma))
+}
+```
+
+```{r , echoe=TRUE ,warning=FALSE}
+(estimateurs1<-Parametres(moy1,var1)) 
+(estimateurs2<-Parametres(moy2,var2)) 
+(estimateurs3 <-Parametres(moy3,var3))
+```
